@@ -1,0 +1,72 @@
+repos:
+  # Hooks nativos e rápidos
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+        stages: [pre-push]
+      - id: check-xml
+        stages: [pre-push]
+      - id: check-yaml
+        stages: [pre-push]
+      - id: check-json
+        stages: [pre-push]
+      - id: detect-private-key
+        stages: [pre-push]
+
+  # Secrets leve (local)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        stages: [pre-push]
+
+  # Node (rápido)
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.9.0
+    hooks:
+      - id: eslint
+        additional_dependencies: ['eslint@9.9.0']
+        files: \.(js|jsx|ts|tsx)$
+        stages: [pre-push]
+
+  # Java (rápido)
+  - repo: https://github.com/pinterest/ktlint # (se usar Kotlin)
+    rev: 1.3.1
+    hooks:
+      - id: ktlint
+        stages: [pre-push]
+
+  # Python (leve)
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        stages: [pre-push]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        stages: [pre-push]
+
+  # Go (leve)
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.60.3
+    hooks:
+      - id: golangci-lint
+        args: [--fast]
+        stages: [pre-push]
+
+  # Hooks custom do seu catálogo central (inclui SAST leve, branch-ahead e resultado auditável)
+  - repo: https://github.com/pcnuness/git-hooks-central.git
+    rev: v1.0.0
+    hooks:
+      - id: branch-ahead-check
+        stages: [pre-push]
+      - id: sast-semantic-fast
+        stages: [pre-push]
+      - id: deps-audit-fast
+        stages: [pre-push]
+      - id: audit-trail
+        stages: [pre-push]
