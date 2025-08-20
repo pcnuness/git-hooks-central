@@ -4,15 +4,15 @@ repos:
     rev: v4.6.0
     hooks:
       - id: end-of-file-fixer
-        stages: [pre-push]
+        stages: [push]
       - id: check-xml
-        stages: [pre-push]
+        stages: [push]
       - id: check-yaml
-        stages: [pre-push]
+        stages: [push]
       - id: check-json
-        stages: [pre-push]
+        stages: [push]
       - id: detect-private-key
-        stages: [pre-push]
+        stages: [push]
 
   # Secrets leve (local)
   - repo: https://github.com/Yelp/detect-secrets
