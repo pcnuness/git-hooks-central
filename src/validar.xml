@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hooks-configuration xmlns="http://www.example.com/hooks">
+    <pre-commit>
+        <enabled>true</enabled>
+        <scripts>
+            <script>mvn checkstyle:check</script>
+            <script>mvn test</script>
+        </scripts>
+    </pre-commit>
+</hooks-configuration>

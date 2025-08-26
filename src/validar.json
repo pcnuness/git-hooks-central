@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Git Hooks Validation Schema",
+  "description": "Schema para validar a estrutura dos hooks",
+  "type": "object",
+  "required": ["hooks"],
+  "properties": {
+    "hooks": {
+      "type": "object",
+    "description": "Configuração dos git hooks",
+      "properties": {
+        "pre-commit": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "scripts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "pre-push": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "scripts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "config": {
+    "type": "object",
+      "properties": {
+        "allowSkip": {
+          "type": "boolean",
+          "default": false,
+          "description": "Permite pular a execução dos hooks"
+        },
+        "logLevel": {
+          "type": "string",
+          "enum": ["error", "warn", "info", "debug"],
+          "default": "info"
+        }
+      }
+    }
+  }
+}
