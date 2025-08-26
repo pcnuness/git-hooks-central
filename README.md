@@ -34,9 +34,16 @@ Node.js:
  * eslint.org
 
 ## Como usar
+
+### Instalação
 ```bash
 pip install pre-commit
 pre-commit install --hook-type pre-push
+```
+
+### Validação
+```bash
+pre-commit run --all-files --hook-stage push -v
 ```
 
 ### Atualizar repositorio central
