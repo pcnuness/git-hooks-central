@@ -3,3 +3,21 @@
   entry: hooks/branch_ahead_check.sh
   language: script
   stages: [pre-push]
+
+- id: sast-semantic-fast
+  name: SAST leve/semântico (rápido)
+  entry: hooks/sast_semantic_fast.sh
+  language: script
+  stages: [pre-push]
+
+- id: deps-audit-fast
+  name: Dependency audit rápido por stack
+  entry: hooks/deps_audit_fast.sh
+  language: script
+  stages: [pre-push]
+
+- id: audit-trail
+  name: Salva resultado auditável para o CI
+  entry: hooks/audit_trail.sh
+  language: script
+  stages: [pre-push]
