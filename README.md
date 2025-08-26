@@ -37,3 +37,9 @@ Node.js:
 ```bash
 pip install pre-commit
 pre-commit install --hook-type pre-push
+```
+
+### Atualizar repositorio central
+```bash
+pre-commit autoupdate --repo https://github.com/pcnuness/git-hooks-central.git
+```
