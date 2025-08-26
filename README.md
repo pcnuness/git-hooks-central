@@ -22,6 +22,17 @@ Repositório centralizado para armazenar e versionar hooks Git utilizados nos pr
 - Resultado auditável salvo para validação do pipeline
 - Hooks executados apenas no estágio `pre-push`
 
+
+## SAST (Static Application Security Testing)
+
+### Ferramentas Sugeridas (CLI para uso local):
+Java: 
+ * pmd.github.io
+ * spotbugs.github.io
+
+Node.js: 
+ * eslint.org
+
 ## Como usar
 ```bash
 pip install pre-commit

@@ -8,7 +8,7 @@ if ls $(changed) 2>/dev/null | grep -q 'package-lock.json\|yarn.lock\|pnpm-lock.
 fi
 
 if ls $(changed) 2>/dev/null | grep -q 'pom.xml\|build.gradle'; then
-  echo "ℹ️ Sugestão: usar OWASP Dependency-Check no CI. Local: pule ou use modo rápido."
+  echo "Sugestao: usar OWASP Dependency-Check no CI. Local: pule ou use modo rápido."
 fi
 
 if ls $(changed) 2>/dev/null | grep -q 'requirements.txt\|poetry.lock\|Pipfile.lock'; then
