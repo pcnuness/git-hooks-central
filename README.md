@@ -7,13 +7,18 @@ Repositório centralizado para armazenar e versionar hooks Git utilizados nos pr
 - `end-of-file-fixer`           → garante newline final
 - `check-json`, `check-xml`, `check-yaml` → valida sintaxe
 - `detect-private-key`          → bloqueia chaves privadas
-- `detect-secrets`              → detecção leve de segredos (com baseline)
 
 ### Custom
 - `branch-ahead-check`          → verifica se a branch está atualizada com a default
 - `sast-semantic-fast`          → SAST leve/semântico (ex.: semgrep)
 - `deps-audit-fast`             → auditoria de dependências rápida por stack
 - `audit-trail`                 → grava artefato local auditável para o CI
+
+#### Referencia
+- SAST (Static Application Security Testing) conforme documentação: https://docs.gitlab.com/user/application_security/sast/
+- Verificação se a branch do desenvolvedor está à frente da master (Check Ahead)
+- Dependency Scanning conforme documentação: https://docs.gitlab.com/user/application_security/dependency_scanning/
+- Secret Detection conforme documentação: https://docs.gitlab.com/user/application_security/secret_detection/
 
 ## Requisitos
 - Mecanismo de prevenção a bypass:
