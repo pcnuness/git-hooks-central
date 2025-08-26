@@ -31,13 +31,6 @@ repos:
         files: \.(js|jsx|ts|tsx)$
         stages: [pre-push]
 
-  # Java (rápido)
-  - repo: https://github.com/pinterest/ktlint # (se usar Kotlin)
-    rev: 1.3.1
-    hooks:
-      - id: ktlint
-        stages: [pre-push]
-
   # Python (leve)
   - repo: https://github.com/psf/black
     rev: 24.8.0
