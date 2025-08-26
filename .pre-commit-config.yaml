@@ -18,21 +18,21 @@ repos:
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.34.0
     hooks:
-      - id: eslint
+      - id: node-eslint
         additional_dependencies: ['eslint@9.9.0']
         files: \.(js|jsx|ts|tsx)$
         stages: [pre-push]
 
-  # Python (leve)
+  # Python
   - repo: https://github.com/psf/black
     rev: 24.8.0
     hooks:
-      - id: black
+      - id: python-black
         stages: [pre-push]
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.1
     hooks:
-      - id: flake8
+      - id: python-flake8
         stages: [pre-push]
 
   # Go (leve)
