@@ -2,4 +2,4 @@
   name: Verifica se a branch está atualizada em relação à default
   entry: hooks/branch_ahead_check.sh
   language: script
-  stages: [push]
+  stages: [pre-push]
