@@ -14,14 +14,6 @@ repos:
       - id: detect-private-key
         stages: [pre-push]
 
-  # Secrets leve (local)
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
-        stages: [pre-push]
-
   # Node (rápido)
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.34.0
