@@ -1,0 +1,13 @@
+hooks:
+  pre-commit:
+    enabled: true
+    scripts:
+      - ./scripts/lint.sh
+      - ./scripts/test.sh
+  pre-push:
+    enabled: true
+    scripts:
+      - ./scripts/build.sh
+config:
+  allowSkip: false
+  logLevel: info
