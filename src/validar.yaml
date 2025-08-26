@@ -10,4 +10,4 @@ hooks:
       - ./scripts/build.sh
 config:
   allowSkip: false
-  logLevel= info
+  logLevel: info
