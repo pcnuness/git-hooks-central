@@ -456,3 +456,40 @@ Novos hooks robustos de segurança implementados:
 - 🆕 `branch-ahead-check` - Verificação de branch atualizada
 - 🆕 `sast-semantic-fast` - SAST rápido com Semgrep
 - 🆕 `deps-audit-fast` - Auditoria rápida de dependências
+
+
+
+## Como os times de projeto usam
+### Instalar pre-commit e os hooks:
+Fluxo para publicar novas versões/tags do repositório central
+Commitar mudanças e criar tag semântica:
+
+```bash
+git checkout -b release/v1.0.0
+git add -A
+git commit -m "feat: adiciona security-pre-push-hook e integrações SAST/DS/Secrets"
+git tag -a v1.0.0 -m "Primeira release com hooks de segurança"
+git push origin release/v1.0.0
+git push origin v1.0.0
+```
+
+#### Publicar incrementos:
+  - Patch (correções): v1.0.1
+  - Minor (novos hooks/opcionais): v1.1.0
+  - Major (breaking changes): v2.0.0
+
+```
+git checkout -b release/v1.1.0
+git add -A
+git commit -m "feat: expõe id 'deps-audit-fast' no catálogo de hooks"
+git tag -a v1.1.0 -m "Release: expõe deps-audit-fast e melhorias"
+git push origin release/v1.1.0
+git push origin v1.1.0
+```
+
+#### Após tag publicada, nos repositórios consumidores:
+```
+pre-commit autoupdate --repo https://github.com/pcnuness/git-hooks-central.git
+git add .pre-commit-config.yaml
+git commit -m "chore(pre-commit): atualiza git-hooks-central para v1.1.0"
+```
