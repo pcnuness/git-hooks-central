@@ -1,0 +1,95 @@
+# =============================================================================
+# CONFIGURAÇÃO DE SEGURANÇA PARA PROJETOS JAVA
+# =============================================================================
+
+# Versões suportadas
+supported_versions:
+  java: "8+"  # Java 8, 11, 17, 21
+  maven: "3.6+"
+  gradle: "7.0+"
+
+# Configurações SAST
+sast:
+  # Semgrep configurações
+  semgrep:
+    config: "p/owasp-top-ten"  # OWASP Top 10 patterns
+    timeout: 60
+    max_target_bytes: 1000000
+  
+  # SpotBugs configurações
+  spotbugs:
+    effort: "max"
+    confidence: "low"
+    include_filter: "spotbugs-include.xml"
+    exclude_filter: "spotbugs-exclude.xml"
+  
+  # PMD configurações
+  pmd:
+    rulesets: "category/java/security.xml,category/java/bestpractices.xml"
+    language: "java"
+    version: "6.55.0"
+
+# Configurações Dependency Scanning
+dependency_scanning:
+  # OWASP Dependency-Check
+  owasp_dependency_check:
+    scan_path: "."
+    output_format: "HTML"
+    output_directory: "reports/dependency-check"
+    fail_on_cvss: 7.0  # Falha se CVSS >= 7.0
+  
+  # Gradle dependency check plugin
+  gradle_plugin:
+    plugin_version: "8.4.0"
+    fail_on_cvss: 7.0
+    formats: ["HTML", "JSON"]
+    output_directory: "build/reports/dependency-check"
+
+# Configurações Secret Detection
+secret_detection:
+  # Padrões específicos para Java
+  patterns:
+    - "private static final String.*=.*['\"][A-Za-z0-9+/]{20,}['\"]"  # Base64
+    - "password.*=.*['\"][^'\"]{8,}['\"]"  # Senhas hardcoded
+    - "api[_-]?key.*=.*['\"][^'\"]{8,}['\"]"  # API keys
+    - "secret.*=.*['\"][^'\"]{8,}['\"]"  # Secrets
+  
+  # Arquivos a ignorar
+  ignore_files:
+    - "**/target/**"
+    - "**/build/**"
+    - "**/.gradle/**"
+    - "**/node_modules/**"
+    - "**/*.min.js"
+    - "**/*.min.css"
+
+# Configurações de performance
+performance:
+  timeout_seconds: 300
+  parallel_scans: 2
+  memory_limit: "2G"
+  
+# Configurações de logging
+logging:
+  level: "INFO"
+  file: ".security-hook.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Configurações de notificação
+notifications:
+  slack_webhook: ""  # Configurar se necessário
+  email: ""  # Configurar se necessário
+  teams_webhook: ""  # Configurar se necessário
+
+# Configurações de fallback
+fallback:
+  # Se uma ferramenta falhar, continuar com outras
+  continue_on_failure: true
+  
+  # Se não conseguir conectar aos serviços, usar modo offline
+  offline_mode: true
+  
+  # Cache de resultados para evitar re-execução
+  enable_cache: true
+  cache_ttl_hours: 24

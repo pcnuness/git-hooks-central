@@ -1,0 +1,152 @@
+# =============================================================================
+# CONFIGURAÇÃO DE SEGURANÇA PARA PROJETOS NODE.JS
+# =============================================================================
+
+# Versões suportadas
+supported_versions:
+  node: "16+"  # Node 16, 18, 20, 21
+  npm: "8+"
+  yarn: "1.22+"
+  pnpm: "7.0+"
+
+# Configurações SAST
+sast:
+  # Semgrep configurações
+  semgrep:
+    config: "p/owasp-top-ten"  # OWASP Top 10 patterns
+    timeout: 60
+    max_target_bytes: 1000000
+  
+  # ESLint configurações
+  eslint:
+    config_file: ".eslintrc"
+    extensions: [".js", ".jsx", ".ts", ".tsx"]
+    security_plugins:
+      - "eslint-plugin-security"
+      - "eslint-plugin-node"
+      - "@typescript-eslint/eslint-plugin"
+  
+  # SonarQube configurações (se disponível)
+  sonarqube:
+    host_url: ""
+    token: ""
+    project_key: ""
+
+# Configurações Dependency Scanning
+dependency_scanning:
+  # npm audit
+  npm_audit:
+    audit_level: "high"  # low, moderate, high, critical
+    production_only: false
+    json_output: true
+    audit_level_fail: "high"
+  
+  # yarn audit
+  yarn_audit:
+    level: "high"
+    groups: true
+    json_output: true
+  
+  # pnpm audit
+  pnpm_audit:
+    audit_level: "high"
+    json_output: true
+  
+  # Snyk (se disponível)
+  snyk:
+    api_token: ""
+    fail_on: "high"
+    monitor: false
+    test: true
+
+# Configurações Secret Detection
+secret_detection:
+  # Padrões específicos para Node.js
+  patterns:
+    - "process\\.env\\.[A-Z_]+.*=.*['\"][^'\"]{8,}['\"]"  # Environment variables hardcoded
+    - "api[_-]?key.*=.*['\"][^'\"]{8,}['\"]"  # API keys
+    - "secret.*=.*['\"][^'\"]{8,}['\"]"  # Secrets
+    - "password.*=.*['\"][^'\"]{8,}['\"]"  # Passwords
+    - "token.*=.*['\"][^'\"]{8,}['\"]"  # Tokens
+    - "private[_-]?key.*=.*['\"][^'\"]{8,}['\"]"  # Private keys
+  
+  # Arquivos a ignorar
+  ignore_files:
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/coverage/**"
+    - "**/.nyc_output/**"
+
+# Configurações de performance
+performance:
+  timeout_seconds: 300
+  parallel_scans: 3
+  memory_limit: "1G"
+  
+  # Cache de dependências
+  cache:
+    npm_cache: true
+    yarn_cache: true
+    pnpm_cache: true
+
+# Configurações de logging
+logging:
+  level: "INFO"
+  file: ".security-hook.log"
+  max_file_size: "10MB"
+  backup_count: 5
+  
+  # Logs específicos para cada ferramenta
+  tools:
+    npm: true
+    yarn: true
+    pnpm: true
+    eslint: true
+    semgrep: true
+
+# Configurações de notificação
+notifications:
+  slack_webhook: ""  # Configurar se necessário
+  email: ""  # Configurar se necessário
+  teams_webhook: ""  # Configurar se necessário
+  
+  # Notificações específicas para vulnerabilidades
+  vulnerability_alerts:
+    critical: true
+    high: true
+    moderate: false
+    low: false
+
+# Configurações de fallback
+fallback:
+  # Se uma ferramenta falhar, continuar com outras
+  continue_on_failure: true
+  
+  # Se não conseguir conectar aos serviços, usar modo offline
+  offline_mode: true
+  
+  # Cache de resultados para evitar re-execução
+  enable_cache: true
+  cache_ttl_hours: 24
+  
+  # Fallback para ferramentas específicas
+  tools:
+    npm: "yarn"  # Se npm falhar, tentar yarn
+    yarn: "pnpm"  # Se yarn falhar, tentar pnpm
+    pnpm: "npm"   # Se pnpm falhar, tentar npm
+
+# Configurações de ambiente
+environment:
+  # Variáveis de ambiente para ferramentas
+  npm_config: {}
+  yarn_config: {}
+  pnpm_config: {}
+  
+  # Configurações de proxy (se necessário)
+  proxy:
+    http: ""
+    https: ""
+    no_proxy: ""

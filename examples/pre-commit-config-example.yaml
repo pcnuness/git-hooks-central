@@ -1,0 +1,189 @@
+# =============================================================================
+# EXEMPLO DE CONFIGURAÇÃO PRE-COMMIT COM HOOKS DE SEGURANÇA
+# =============================================================================
+# Copie este arquivo para .pre-commit-config.yaml e ajuste conforme necessário
+# =============================================================================
+
+repos:
+  # =============================================================================
+  # HOOKS NATIVOS E RÁPIDOS
+  # =============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # Verificações básicas de arquivos
+      - id: end-of-file-fixer
+        stages: [pre-push]
+      - id: check-xml
+        stages: [pre-push]
+      - id: check-yaml
+        stages: [pre-push]
+      - id: check-json
+        stages: [pre-push]
+      - id: detect-private-key
+        stages: [pre-push]
+      
+      # Verificações adicionais de segurança
+      - id: trailing-whitespace
+        stages: [pre-push]
+      - id: check-merge-conflict
+        stages: [pre-push]
+      - id: check-added-large-files
+        stages: [pre-push]
+        args: [--maxkb=1000]
+
+  # =============================================================================
+  # HOOKS PARA NODE.JS
+  # =============================================================================
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.34.0
+    hooks:
+      - id: eslint
+        additional_dependencies: ['eslint@9.9.0']
+        files: \.(js|jsx|ts|tsx)$
+        stages: [pre-push]
+        args: [--fix]
+
+  # =============================================================================
+  # HOOKS PARA PYTHON
+  # =============================================================================
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        stages: [pre-push]
+        language_version: python3
+  
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        stages: [pre-push]
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+
+  # =============================================================================
+  # HOOKS PARA GO
+  # =============================================================================
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.4.0
+    hooks:
+      - id: golangci-lint
+        args: [--fast]
+        stages: [pre-push]
+
+  # =============================================================================
+  # HOOKS PARA JAVA
+  # =============================================================================
+  - repo: https://github.com/pre-commit/mirrors-checkstyle
+    rev: 10.12.5
+    hooks:
+      - id: checkstyle
+        stages: [pre-push]
+        args: [--ruleset=google_checks.xml]
+        files: \.(java)$
+
+  # =============================================================================
+  # HOOKS CUSTOM DE SEGURANÇA
+  # =============================================================================
+  - repo: local
+    hooks:
+      # Hook principal de segurança
+      - id: security-pre-push-hook
+        name: Security Pre-Push Hook
+        entry: bash hooks/security_pre_push.sh
+        language: system
+        stages: [pre-push]
+        always_run: true
+        description: "Executa verificações de segurança: SAST, Dependency Scanning, Secret Detection e Branch Ahead Check"
+        pass_filenames: false
+      
+      # Hook de verificação de branch (alternativo)
+      - id: branch-ahead-check
+        name: Branch Ahead Check
+        entry: bash hooks/branch_ahead_check.sh
+        language: system
+        stages: [pre-push]
+        description: "Verifica se a branch está atualizada com a master/main"
+        pass_filenames: false
+      
+      # Hook SAST rápido (alternativo)
+      - id: sast-semantic-fast
+        name: SAST Semantic Fast
+        entry: bash hooks/sast_semantic_fast.sh
+        language: system
+        stages: [pre-push]
+        description: "Executa SAST rápido com Semgrep"
+        pass_filenames: false
+      
+      # Hook de auditoria de dependências (alternativo)
+      - id: deps-audit-fast
+        name: Dependencies Audit Fast
+        entry: bash hooks/deps_audit_fast.sh
+        language: system
+        stages: [pre-push]
+        description: "Executa auditoria rápida de dependências"
+        pass_filenames: false
+
+  # =============================================================================
+  # HOOKS ADICIONAIS DE SEGURANÇA
+  # =============================================================================
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        stages: [pre-push]
+        args: [--baseline, .secrets.baseline]
+        exclude: |
+          (?x)^(
+              \.git/|
+              \.venv/|
+              node_modules/|
+              \.m2/|
+              \.gradle/|
+              build/|
+              target/
+          )$
+
+  # =============================================================================
+  # HOOKS PARA VALIDAÇÃO DE CONFIGURAÇÕES
+  # =============================================================================
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        stages: [pre-push]
+        args: [--format, parsable, --strict]
+        files: \.(yaml|yml)$
+
+  # =============================================================================
+  # HOOKS PARA VALIDAÇÃO DE DOCKER
+  # =============================================================================
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        stages: [pre-push]
+        files: Dockerfile
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+# =============================================================================
+# CONFIGURAÇÕES GLOBAIS
+# =============================================================================
+default_language_version:
+  python: python3
+  node: 18
+
+# Configurações de cache
+cache:
+  timeout: 300
+  max_size: 100MB
+
+# Configurações de logging
+logging:
+  level: INFO
+  file: .pre-commit.log
+
+# Configurações de performance
+performance:
+  parallel: true
+  max_workers: 4

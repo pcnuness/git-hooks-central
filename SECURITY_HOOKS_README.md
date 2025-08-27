@@ -1,8 +1,8 @@
-# Git Hooks Central - Hooks de Segurança e Conformidade
+# Hooks de Segurança Pre-Push
 
-Este repositório centraliza hooks de Git robustos para verificação de segurança e conformidade em projetos Java e Node.js, implementados usando o framework pre-commit.
+Este repositório contém hooks de segurança robustos para projetos Java e Node.js, implementados usando o framework pre-commit.
 
-## 🚀 Funcionalidades Principais
+## 🚀 Funcionalidades
 
 ### ✅ Verificações de Segurança Implementadas
 
@@ -89,13 +89,6 @@ hooks/
 ├── sast_semantic_fast.sh        # Hook SAST rápido (legado)
 ├── deps_audit_fast.sh           # Hook de auditoria (legado)
 └── branch_ahead_check.sh        # Hook de verificação (legado)
-
-examples/
-├── demo-security-hook.sh        # Script de demonstração
-├── pre-commit-config-example.yaml # Configuração de exemplo
-└── env.example                  # Variáveis de ambiente
-
-SECURITY_HOOKS_README.md         # Documentação completa
 ```
 
 ## ⚙️ Configuração
@@ -422,7 +415,7 @@ Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICEN
 
 ### Canais de Suporte
 - **Issues**: [GitHub Issues](https://github.com/seu-usuario/git-hooks-central/issues)
-- **Documentação**: [SECURITY_HOOKS_README.md](SECURITY_HOOKS_README.md)
+- **Documentação**: Este README
 - **Logs**: `.security-hook.log`
 
 ### Informações de Contato
@@ -433,26 +426,3 @@ Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICEN
 ---
 
 **⚠️ Importante**: Este hook é uma camada adicional de segurança. Não substitui outras práticas de segurança como code review, testes automatizados e monitoramento contínuo.
-
-## 📋 Status dos Hooks Existentes
-
-Os seguintes hooks já estão implementados e funcionando:
-
-- ✅ `end-of-file-fixer` - Corrige final de arquivos
-- ✅ `check-xml` - Valida arquivos XML
-- ✅ `check-yaml` - Valida arquivos YAML
-- ✅ `check-json` - Valida arquivos JSON
-- ✅ `detect-private-key` - Detecta chaves privadas
-- ✅ `eslint` - Linting para JavaScript/TypeScript
-- ✅ `black` - Formatação de código Python
-- ✅ `flake8` - Linting para Python
-- ✅ `golangci-lint` - Linting para Go
-
-## 🆕 Hooks de Segurança Adicionados
-
-Novos hooks robustos de segurança implementados:
-
-- 🆕 `security-pre-push-hook` - Hook principal de segurança
-- 🆕 `branch-ahead-check` - Verificação de branch atualizada
-- 🆕 `sast-semantic-fast` - SAST rápido com Semgrep
-- 🆕 `deps-audit-fast` - Auditoria rápida de dependências
