@@ -44,14 +44,27 @@ repos:
         stages: [pre-push]
 
   # Hooks custom do seu catálogo central (inclui SAST leve, branch-ahead e resultado auditável)
-  #- repo: https://github.com/pcnuness/git-hooks-central.git
-  #  rev: v1.0.0
-  #  hooks:
-  #    - id: branch-ahead-check
-  #      stages: [pre-push]
-  #    - id: sast-semantic-fast
-  #      stages: [pre-push]
-  #    - id: deps-audit-fast
-  #      stages: [pre-push]
-  #    - id: audit-trail
-  #      stages: [pre-push]
+  - repo: https://github.com/pcnuness/git-hooks-central.git
+    rev: v1.0.0
+    hooks:
+      - id: security-pre-push-hook
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+      
+      - id: branch-ahead-check
+        stages: [pre-push]
+        pass_filenames: false
+      
+      - id: sast-semantic-fast
+        stages: [pre-push]
+        pass_filenames: false
+      
+      - id: deps-audit-fast
+        stages: [pre-push]
+        pass_filenames: false
+      
+      - id: audit-trail
+        stages: [pre-push]
+        pass_filenames: false
+      

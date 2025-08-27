@@ -1,23 +1,29 @@
+- id: security-pre-push-hook
+  name: Security Pre-Push Hook
+  entry: hooks/security_pre_push.sh
+  language: script
+  stages: [pre-push]
+
 - id: branch-ahead-check
   name: Verifica se a branch está atualizada em relação à default
   entry: hooks/branch_ahead_check.sh
   language: script
   stages: [pre-push]
 
-#- id: sast-semantic-fast
-#  name: SAST leve/semântico (rápido)
-#  entry: hooks/sast_semantic_fast.sh
-#  language: script
-#  stages: [pre-push]
-#
-#- id: deps-audit-fast
-#  name: Dependency audit rápido por stack
-#  entry: hooks/deps_audit_fast.sh
-#  language: script
-#  stages: [pre-push]
-#
-#- id: audit-trail
-#  name: Salva resultado auditável para o CI
-#  entry: hooks/audit_trail.sh
-#  language: script
-#  stages: [pre-push]
+- id: sast-semantic-fast
+  name: SAST leve/semântico (rápido)
+  entry: hooks/sast_semantic_fast.sh
+  language: script
+  stages: [pre-push]
+
+- id: deps-audit-fast
+  name: Dependency audit rápido por stack
+  entry: hooks/deps_audit_fast.sh
+  language: script
+  stages: [pre-push]
+
+- id: audit-trail
+  name: Salva resultado auditável para o CI
+  entry: hooks/audit_trail.sh
+  language: script
+  stages: [pre-push]
