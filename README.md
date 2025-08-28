@@ -2,6 +2,13 @@
 
 Este repositório centraliza hooks de Git robustos para verificação de segurança e conformidade em projetos Java e Node.js, implementados usando o framework pre-commit.
 
+## 🔒 Dependências para Validação do Código
+
+- **SAST**: Semgrep com regras OWASP Top 10
+- **Secret Detection**: GitLeaks + TruffleHog (dupla verificação)
+- **Dependency Scanning**: OWASP Dependency-Check para Java
+- **Code Quality**: Hooks nativos do pre-commit
+
 ## 🚀 Funcionalidades Principais
 
 ### ✅ Verificações de Segurança Implementadas
@@ -47,11 +54,11 @@ Este repositório centraliza hooks de Git robustos para verificação de seguran
 ### Ferramentas de Segurança
 ```bash
 # Instalação automática via script
-bash hooks/install-security-hooks.sh
+bash scripts/install-security-hooks.sh
 
 # Ou instalação manual
 pip install pre-commit semgrep trufflehog
-brew install gitleaks dependency-check  # macOS
+brew install gitleaks dependency-check
 ```
 
 ## 🚀 Instalação Rápida
@@ -83,7 +90,6 @@ cp hooks/node-security-config.yaml ./
 ```
 hooks/
 ├── security_pre_push.sh          # Hook principal de segurança
-├── install-security-hooks.sh     # Script de instalação
 ├── java-security-config.yaml     # Configuração para Java
 ├── node-security-config.yaml     # Configuração para Node.js
 ├── sast_semantic_fast.sh        # Hook SAST rápido (legado)
@@ -95,49 +101,12 @@ examples/
 ├── pre-commit-config-example.yaml # Configuração de exemplo
 └── env.example                  # Variáveis de ambiente
 
+scripts/
+├── install-security-hooks.sh     # Script de instalação
+
 SECURITY_HOOKS_README.md         # Documentação completa
 ```
 
-## ⚙️ Configuração
-
-### Configuração Básica
-
-O hook é configurado automaticamente via `.pre-commit-config.yaml`:
-
-```yaml
-- repo: local
-  hooks:
-    - id: security-pre-push-hook
-      name: Security Pre-Push Hook
-      entry: bash hooks/security_pre_push.sh
-      language: system
-      stages: [pre-push]
-      always_run: true
-```
-
-### Configurações Específicas
-
-#### Java
-```yaml
-# hooks/java-security-config.yaml
-sast:
-  semgrep:
-    config: "p/owasp-top-ten"
-    timeout: 60
-
-dependency_scanning:
-  owasp_dependency_check:
-    fail_on_cvss: 7.0
-```
-
-#### Node.js
-```yaml
-# hooks/node-security-config.yaml
-dependency_scanning:
-  npm_audit:
-    audit_level: "high"
-    production_only: false
-```
 
 ## 🔧 Uso
 
