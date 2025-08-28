@@ -1,0 +1,120 @@
+# Pipeline GitLab para validação pre-commit (backstop)
+# Copie este arquivo para .gitlab-ci.yml e ajuste conforme necessário
+
+stages:
+  - validate
+  - test
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
+
+cache:
+  paths:
+    - .pip-cache/
+    - .cache/pre-commit/
+
+# Validação pre-commit (obrigatória para PRs)
+pre-commit-validation:
+  stage: validate
+  image: python:3.11-slim
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install pre-commit
+    - pre-commit install --hook-type pre-push
+  script:
+    - echo "🔍 Executando validação pre-commit..."
+    - pre-commit run --all-files --hook-stage push -v
+    - echo "✅ Validação pre-commit concluída com sucesso"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: false
+  timeout: 10m
+
+# Validação do artefato de auditoria (opcional)
+validate-audit-artifact:
+  stage: validate
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache jq
+  script:
+    - echo "🔍 Validando artefato de auditoria..."
+    - |
+      if [ -f .git/hooks_artifacts/prepush.json ]; then
+        echo "📄 Artefato encontrado:"
+        cat .git/hooks_artifacts/prepush.json
+        echo ""
+        echo "🔍 Validando estrutura do artefato..."
+        jq -e '.commit and .author and .date and .precommit_config_sha1 and .status == "passed-local"' .git/hooks_artifacts/prepush.json
+        echo "✅ Artefato de auditoria válido"
+      else
+        echo "⚠️ Artefato de auditoria não encontrado"
+        echo "ℹ️ Isso pode indicar que os hooks não foram executados localmente"
+        exit 1
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: true  # Opcional, não falha o pipeline
+  timeout: 2m
+
+# Testes da aplicação
+test:
+  stage: test
+  image: node:18-alpine  # Ajuste conforme sua stack
+  script:
+    - echo "🧪 Executando testes..."
+    - npm ci
+    - npm test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: false
+
+# Build da aplicação
+build:
+  stage: build
+  image: node:18-alpine  # Ajuste conforme sua stack
+  script:
+    - echo "🏗️ Executando build..."
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+      - build/
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: false
+
+# Job de segurança (execução completa de SAST)
+security-scan:
+  stage: test
+  image: python:3.11-slim
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install semgrep
+  script:
+    - echo "🔒 Executando scan de segurança completo..."
+    - semgrep ci --config p/owasp-top-ten --json --output semgrep-results.json
+    - |
+      if [ -s semgrep-results.json ]; then
+        echo "⚠️ Problemas de segurança encontrados:"
+        cat semgrep-results.json | jq '.results[] | "\(.check_id): \(.message) in \(.path):\(.start.line)"'
+        exit 1
+      else
+        echo "✅ Nenhum problema de segurança encontrado"
+      fi
+  artifacts:
+    paths:
+      - semgrep-results.json
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: true  # Não falha o pipeline, mas gera relatório
+  timeout: 15m

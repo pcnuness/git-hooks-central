@@ -1,0 +1,74 @@
+# Modelo de configuração pre-commit genérico
+# Copie este arquivo para .pre-commit-config.yaml e ajuste conforme necessário
+
+repos:
+  # Hooks nativos e rápidos (obrigatórios)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+        stages: [pre-push]
+      - id: check-json
+        stages: [pre-push]
+      - id: check-xml
+        stages: [pre-push]
+      - id: check-yaml
+        stages: [pre-push]
+      - id: detect-private-key
+        stages: [pre-push]
+      - id: detect-secrets
+        stages: [pre-push]
+        args: [--baseline, .secrets.baseline]
+
+  # Catálogo central de hooks de segurança (SEMPRE usar tag específica)
+  - repo: https://github.com/pcnuness/git-hooks-central.git
+    rev: v1.0.0  # ⚠️ NUNCA usar main ou latest
+    hooks:
+      - id: audit-trail
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+      
+      - id: branch-ahead-check
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+      
+      - id: deps-audit-fast
+        stages: [pre-push]
+        pass_filenames: false
+      
+      - id: sast-semantic-fast
+        stages: [pre-push]
+        pass_filenames: false
+
+  # Hooks adicionais opcionais (descomente conforme necessário)
+  
+  # Para projetos Python
+  # - repo: https://github.com/psf/black
+  #   rev: 25.1.0
+  #   hooks:
+  #     - id: black
+  #       stages: [pre-push]
+  
+  # Para projetos Go
+  # - repo: https://github.com/golangci/golangci-lint
+  #   rev: v2.4.0
+  #   hooks:
+  #     - id: golangci-lint
+  #       args: [--fast]
+  #       stages: [pre-push]
+  
+  # Para projetos Rust
+  # - repo: https://github.com/pre-commit/mirrors-rust
+  #   rev: v1.70.0
+  #   hooks:
+  #     - id: rustfmt
+  #       stages: [pre-push]
+
+# Configurações globais
+default_language_version:
+  python: "3.11"
+
+# Configurações de timeout (garantir <300s total)
+# Nota: Os timeouts são configurados individualmente nos hooks acima

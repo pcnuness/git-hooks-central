@@ -1,0 +1,75 @@
+# Modelo de configuração pre-commit para projetos Node.js
+# Copie este arquivo para .pre-commit-config.yaml e ajuste conforme necessário
+
+repos:
+  # Hooks nativos e rápidos (obrigatórios)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+        stages: [pre-push]
+      - id: check-json
+        stages: [pre-push]
+      - id: check-yaml
+        stages: [pre-push]
+      - id: detect-private-key
+        stages: [pre-push]
+      - id: detect-secrets
+        stages: [pre-push]
+        args: [--baseline, .secrets.baseline]
+
+  # Catálogo central de hooks de segurança (SEMPRE usar tag específica)
+  - repo: https://github.com/pcnuness/git-hooks-central.git
+    rev: v1.0.0  # ⚠️ NUNCA usar main ou latest
+    hooks:
+      - id: audit-trail
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+      
+      - id: branch-ahead-check
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+      
+      - id: deps-audit-fast
+        stages: [pre-push]
+        pass_filenames: false
+      
+      - id: sast-semantic-fast
+        stages: [pre-push]
+        pass_filenames: false
+
+  # Hooks específicos para Node.js (opcional)
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.34.0
+    hooks:
+      - id: eslint
+        additional_dependencies: ['eslint@9.9.0']
+        files: \.(js|jsx|ts|tsx)$
+        stages: [pre-push]
+        args: [--fix]
+
+  # Validação de dependências (opcional)
+  - repo: https://github.com/pre-commit/mirrors-npm-audit
+    rev: v1.0.0
+    hooks:
+      - id: npm-audit
+        stages: [pre-push]
+        args: [--audit-level, high]
+
+  # Validação de lock files (opcional)
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        stages: [pre-push]
+        files: \.(js|jsx|ts|tsx|json|yaml|yml|md)$
+        args: [--write]
+
+# Configurações globais
+default_language_version:
+  node: "18"
+
+# Configurações de timeout (garantir <300s total)
+# Nota: Os timeouts são configurados individualmente nos hooks acima
