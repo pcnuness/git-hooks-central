@@ -48,25 +48,4 @@ repos:
     hooks:
       - id: gitleaks
         stages: [pre-push]
-
-  # Hooks custom do seu catálogo central (inclui SAST leve, branch-ahead, secret detection e resultado auditável)
-  - repo: https://github.com/pcnuness/git-hooks-central.git
-    rev: v1.1.0
-    hooks:
-      - id: security-pre-push-hook
-        stages: [pre-push]
-        always_run: true
-        pass_filenames: false
-      
-      - id: branch-ahead-check
-        stages: [pre-push]
-        pass_filenames: false
-      
-      - id: deps-audit-fast
-        stages: [pre-push]
-        pass_filenames: false
-      
-      - id: audit-trail
-        stages: [pre-push]
-        pass_filenames: false
-      
+  

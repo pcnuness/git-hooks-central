@@ -119,6 +119,9 @@ git push  # Hooks executam automaticamente
 
 ### Execução Manual
 ```bash
+# Instalar o hooks/pre-push (framework pre-commit)
+pre-commit install --hook-type pre-push
+
 # Executar todos os hooks
 pre-commit run --all-files --hook-stage pre-push
 
