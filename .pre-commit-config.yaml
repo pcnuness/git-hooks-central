@@ -43,6 +43,12 @@ repos:
         args: [--fast]
         stages: [pre-push]
 
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        stages: [pre-push]
+
   # Hooks custom do seu catálogo central (inclui SAST leve, branch-ahead e resultado auditável)
   - repo: https://github.com/pcnuness/git-hooks-central.git
     rev: v1.0.3
