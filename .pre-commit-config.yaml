@@ -42,3 +42,9 @@ repos:
       - id: golangci-lint
         args: [--fast]
         stages: [pre-push]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        stages: [pre-push]
