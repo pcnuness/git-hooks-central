@@ -1,4 +1,4 @@
-# Git Hooks Central
+# Git Hooks Central (Framework pre-commit)
 
 Repositório centralizado para armazenar e versionar hooks Git utilizados nos projetos da organização.
 
