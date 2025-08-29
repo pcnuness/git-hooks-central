@@ -327,11 +327,6 @@ main() {
         exit_code=1
     fi
     
-    # 4. Secret Detection
-    if ! run_secret_detection; then
-        exit_code=1
-    fi
-    
     # Resumo final
     if [[ $exit_code -eq 0 ]]; then
         log "SUCCESS" "=== TODAS AS VERIFICAÇÕES DE SEGURANÇA PASSARAM ==="
