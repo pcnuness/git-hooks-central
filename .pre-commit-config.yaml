@@ -51,7 +51,7 @@ repos:
 
   # Hooks custom do seu catálogo central (inclui SAST leve, branch-ahead, secret detection e resultado auditável)
   - repo: https://github.com/pcnuness/git-hooks-central.git
-    rev: v1.0.3
+    rev: v1.0.4
     hooks:
       - id: security-pre-push-hook
         stages: [pre-push]
