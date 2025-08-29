@@ -291,42 +291,6 @@ run_node_dependency_scanning() {
 }
 
 # =============================================================================
-# 4. SECRET DETECTION
-# =============================================================================
-run_secret_detection() {
-    log "INFO" "Executando Secret Detection..."
-    
-    # Detect secrets (pre-commit hook já configurado)
-    log "INFO" "Secret detection já configurado via pre-commit hooks"
-    
-    # GitLeaks (se disponível)
-    if command_exists gitleaks; then
-        log "INFO" "Executando GitLeaks..."
-        if timeout_cmd "$TIMEOUT_SECONDS" gitleaks detect --source . --verbose; then
-            log "SUCCESS" "GitLeaks não encontrou secrets expostos"
-        else
-            log "ERROR" "GitLeaks encontrou secrets expostos"
-            return 1
-        fi
-    else
-        log "WARNING" "GitLeaks não encontrado. Instale com: brew install gitleaks (macOS)"
-    fi
-    
-    # TruffleHog (se disponível)
-    if command_exists trufflehog; then
-        log "INFO" "Executando TruffleHog..."
-        if timeout_cmd "$TIMEOUT_SECONDS" trufflehog --only-verified --fail .; then
-            log "SUCCESS" "TruffleHog não encontrou secrets expostos"
-        else
-            log "ERROR" "TruffleHog encontrou secrets expostos"
-            return 1
-        fi
-    else
-        log "WARNING" "TruffleHog não encontrado. Instale com: pip install trufflehog"
-    fi
-}
-
-# =============================================================================
 # FUNÇÃO PRINCIPAL
 # =============================================================================
 main() {

@@ -81,16 +81,6 @@ install_security_tools() {
         fi
     fi
     
-    # GitLeaks
-    if ! command_exists gitleaks; then
-        log "INFO" "Instalando GitLeaks..."
-        if command_exists brew; then
-            brew install gitleaks
-        elif command_exists apt; then
-            sudo apt-get install gitleaks
-        fi
-    fi
-    
     # TruffleHog
     if ! command_exists trufflehog; then
         log "INFO" "Instalando TruffleHog..."
@@ -101,7 +91,7 @@ install_security_tools() {
         fi
     fi
     
-    # OWASP Dependency-Check (Java)
+    # OWASP Dependency-Check (Java/Node/Python/go)
     if ! command_exists dependency-check; then
         log "INFO" "Instalando OWASP Dependency-Check..."
         if command_exists brew; then
