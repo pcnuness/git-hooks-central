@@ -20,4 +20,4 @@
   name: Salva resultado auditável para o CI
   entry: hooks/audit_trail.sh
   language: script
-  stages: [pre-commit]
+  stages: [commit]
