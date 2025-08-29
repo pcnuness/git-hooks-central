@@ -1,7 +1,8 @@
-# Git Hooks Central - Hooks de Segurança e Conformidade
+# Git Hooks Central
 
-Este repositório centraliza hooks de Git robustos para verificação de segurança e conformidade em projetos Java e Node.js, implementados usando o framework pre-commit.
+Repositório centralizado para armazenar e versionar hooks Git utilizados nos projetos da organização.
 
+<<<<<<< HEAD
 ## 🔒 Dependências para Validação do Código
 
 - **SAST**: Semgrep com regras OWASP Top 10
@@ -10,49 +11,49 @@ Este repositório centraliza hooks de Git robustos para verificação de seguran
 - **Code Quality**: Hooks nativos do pre-commit
 
 ## 🚀 Funcionalidades Principais
+=======
+## Hooks disponíveis (pre-push)
+### Default (rápidos)
+- `end-of-file-fixer`           → garante newline final
+- `check-json`, `check-xml`, `check-yaml` → valida sintaxe
+- `detect-private-key`          → bloqueia chaves privadas
+>>>>>>> parent of 1740c05 (initial project)
 
-### ✅ Verificações de Segurança Implementadas
+### Custom
+- `branch-ahead-check`          → verifica se a branch está atualizada com a default
+- `sast-semantic-fast`          → SAST leve/semântico (ex.: semgrep)
+- `deps-audit-fast`             → auditoria de dependências rápida por stack
+- `audit-trail`                 → grava artefato local auditável para o CI
 
-1. **SAST (Static Application Security Testing)**
-   - Semgrep com padrões OWASP Top 10
-   - SpotBugs para Java
-   - ESLint com regras de segurança para Node.js
+#### Referencia
+- SAST (Static Application Security Testing) conforme documentação: https://docs.gitlab.com/user/application_security/sast/
+- Verificação se a branch do desenvolvedor está à frente da master (Check Ahead)
+- Dependency Scanning conforme documentação: https://docs.gitlab.com/user/application_security/dependency_scanning/
+- Secret Detection conforme documentação: https://docs.gitlab.com/user/application_security/secret_detection/
 
-2. **Branch Ahead Check**
-   - Verifica se a branch está atualizada com a master/main
-   - Previne push de branches desatualizadas
+## Requisitos
+- Mecanismo de prevenção a bypass:
+  - A) Artefato assinado/hasheado validado no CI
+  - B) Backstop no pipeline (fail se hooks não passarem)
+- Resultado auditável salvo para validação do pipeline
+- Hooks executados apenas no estágio `pre-push`
 
-3. **Dependency Scanning**
-   - OWASP Dependency-Check para Java
-   - npm/yarn/pnpm audit para Node.js
-   - Gradle dependency check plugin
 
-4. **Secret Detection**
-   - GitLeaks para detecção de secrets
-   - TruffleHog para análise de código
-   - Padrões customizados para Java e Node.js
+## SAST (Static Application Security Testing)
 
-## 🛠️ Compatibilidade
+### Ferramentas Sugeridas (CLI para uso local):
+Java: 
+ * pmd.github.io
+ * spotbugs.github.io
 
-### Java
-- **Versões suportadas**: Java 8+
-- **Build tools**: Maven 3.6+, Gradle 7.0+
-- **Ferramentas**: Semgrep, SpotBugs, OWASP Dependency-Check
+Node.js: 
+ * eslint.org
 
-### Node.js
-- **Versões suportadas**: Node 16+
-- **Package managers**: npm 8+, yarn 1.22+, pnpm 7.0+
-- **Ferramentas**: Semgrep, ESLint, npm audit
+## Como usar
 
-## 📋 Pré-requisitos
-
-### Sistema
-- Git
-- Bash (Linux/macOS) ou Git Bash (Windows)
-- Python 3.7+ (para pre-commit)
-
-### Ferramentas de Segurança
+### Instalação
 ```bash
+<<<<<<< HEAD
 # Instalação automática via script
 bash scripts/install-security-hooks.sh
 
@@ -293,30 +294,22 @@ dependency_scanning:
 ```bash
 # Verificar instalação
 pre-commit --version
+=======
+pip install pre-commit
+>>>>>>> parent of 1740c05 (initial project)
 pre-commit install --hook-type pre-push
-
-# Verificar permissões
-chmod +x hooks/security_pre_push.sh
 ```
 
-#### 2. Ferramentas não encontradas
+### Validação
 ```bash
-# Instalar ferramentas
-bash hooks/install-security-hooks.sh
-
-# Verificar PATH
-which semgrep
-which gitleaks
+pre-commit run --all-files --hook-stage push -v
 ```
 
-#### 3. Timeout nas verificações
+### Atualizar repositorio central
 ```bash
-# Aumentar timeout
-export SECURITY_HOOK_TIMEOUT=600
-
-# Usar modo rápido
-export SECURITY_HOOK_FAST_MODE=true
+pre-commit autoupdate --repo https://github.com/pcnuness/git-hooks-central.git
 ```
+<<<<<<< HEAD
 
 #### 4. Falsos positivos
 ```bash
@@ -462,3 +455,5 @@ pre-commit autoupdate --repo https://github.com/pcnuness/git-hooks-central.git
 git add .pre-commit-config.yaml
 git commit -m "chore(pre-commit): atualiza git-hooks-central para v1.1.0"
 ```
+=======
+>>>>>>> parent of 1740c05 (initial project)
