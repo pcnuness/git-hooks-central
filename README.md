@@ -2,7 +2,6 @@
 
 Repositório centralizado para armazenar e versionar hooks Git utilizados nos projetos da organização.
 
-<<<<<<< HEAD
 ## 🔒 Dependências para Validação do Código
 
 - **SAST**: Semgrep com regras OWASP Top 10
@@ -11,13 +10,11 @@ Repositório centralizado para armazenar e versionar hooks Git utilizados nos pr
 - **Code Quality**: Hooks nativos do pre-commit
 
 ## 🚀 Funcionalidades Principais
-=======
 ## Hooks disponíveis (pre-push)
 ### Default (rápidos)
 - `end-of-file-fixer`           → garante newline final
 - `check-json`, `check-xml`, `check-yaml` → valida sintaxe
 - `detect-private-key`          → bloqueia chaves privadas
->>>>>>> parent of 1740c05 (initial project)
 
 ### Custom
 - `branch-ahead-check`          → verifica se a branch está atualizada com a default
