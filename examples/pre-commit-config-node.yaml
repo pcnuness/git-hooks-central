@@ -14,49 +14,37 @@ repos:
         stages: [pre-push]
       - id: detect-private-key
         stages: [pre-push]
-      - id: detect-secrets
-        stages: [pre-push]
-        args: [--baseline, .secrets.baseline]
 
   # Catálogo central de hooks de segurança (SEMPRE usar tag específica)
   - repo: https://github.com/pcnuness/git-hooks-central.git
-    rev: v1.0.0  # ⚠️ NUNCA usar main ou latest
+    rev: v1.0.3
     hooks:
-      - id: audit-trail
+      - id: security-pre-push-hook
         stages: [pre-push]
-        pass_filenames: false
         always_run: true
+        pass_filenames: false
       
       - id: branch-ahead-check
         stages: [pre-push]
         pass_filenames: false
-        always_run: true
       
       - id: deps-audit-fast
         stages: [pre-push]
         pass_filenames: false
       
-      - id: sast-semantic-fast
+      - id: audit-trail
         stages: [pre-push]
         pass_filenames: false
 
-  # Hooks específicos para Node.js (opcional)
+  # Hooks específicos para Node.js (ESLint moderno)
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.34.0
     hooks:
       - id: eslint
-        additional_dependencies: ['eslint@9.9.0']
+        additional_dependencies: ['eslint@9.9.0', '@eslint/js', 'globals']
         files: \.(js|jsx|ts|tsx)$
         stages: [pre-push]
         args: [--fix]
-
-  # Validação de dependências (opcional)
-  - repo: https://github.com/pre-commit/mirrors-npm-audit
-    rev: v1.0.0
-    hooks:
-      - id: npm-audit
-        stages: [pre-push]
-        args: [--audit-level, high]
 
   # Validação de lock files (opcional)
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -67,9 +55,8 @@ repos:
         files: \.(js|jsx|ts|tsx|json|yaml|yml|md)$
         args: [--write]
 
-# Configurações globais
-default_language_version:
-  node: "18"
-
-# Configurações de timeout (garantir <300s total)
-# Nota: Os timeouts são configurados individualmente nos hooks acima
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        stages: [pre-push]

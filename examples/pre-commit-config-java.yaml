@@ -20,23 +20,22 @@ repos:
 
   # Catálogo central de hooks de segurança (SEMPRE usar tag específica)
   - repo: https://github.com/pcnuness/git-hooks-central.git
-    rev: v1.0.0  # ⚠️ NUNCA usar main ou latest
+    rev: v1.0.3
     hooks:
-      - id: audit-trail
+      - id: security-pre-push-hook
         stages: [pre-push]
-        pass_filenames: false
         always_run: true
+        pass_filenames: false
       
       - id: branch-ahead-check
         stages: [pre-push]
         pass_filenames: false
-        always_run: true
       
       - id: deps-audit-fast
         stages: [pre-push]
         pass_filenames: false
       
-      - id: sast-semantic-fast
+      - id: audit-trail
         stages: [pre-push]
         pass_filenames: false
 
@@ -67,9 +66,8 @@ repos:
         files: \.(java)$
         args: [--aosp]
 
-# Configurações globais
-default_language_version:
-  java: "17"
-
-# Configurações de timeout (garantir <300s total)
-# Nota: Os timeouts são configurados individualmente nos hooks acima
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        stages: [pre-push]
