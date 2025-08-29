@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  git-hooks:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.hooks
+    image: git-hooks-central:latest
+    container_name: git-hooks-runner
+    volumes:
+      # Volume para o código do projeto
+      - ..:/workspace
+      # Volume para configuração Git do usuário
+      - ~/.gitconfig:/root/.gitconfig:ro
+      # Volume para cache de dependências (opcional)
+      - git-hooks-cache:/root/.cache
+    working_dir: /workspace
+    environment:
+      # Variáveis de ambiente para Git
+      - GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME:-Git Hooks}
+      - GIT_AUTHOR_EMAIL=${GIT_AUTHOR_EMAIL:-hooks@example.com}
+      - GIT_COMMITTER_NAME=${GIT_COMMITTER_NAME:-Git Hooks}
+      - GIT_COMMITTER_EMAIL=${GIT_COMMITTER_EMAIL:-hooks@example.com}
+      # Timeout para hooks
+      - TIMEOUT_SECONDS=300
+      # Branch padrão
+      - DEFAULT_BRANCH=${DEFAULT_BRANCH:-main}
+    # Comando padrão (executar bash)
+    command: /bin/bash
+    # Não manter container rodando
+    tty: false
+    stdin_open: false
+    # Limpar recursos automaticamente
+    restart: "no"
+    # Usar rede host para melhor performance
+    network_mode: host
+
+volumes:
+  git-hooks-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /tmp/git-hooks-cache

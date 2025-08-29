@@ -1,0 +1,80 @@
+# Dockerfile para ambiente de hooks Git
+# Multi-stage build para otimizar tamanho
+
+# Stage 1: Base com ferramentas essenciais
+FROM ubuntu:22.04 as base
+
+# Evitar prompts interativos
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    wget \
+    unzip \
+    python3 \
+    python3-pip \
+    python3-venv \
+    openjdk-11-jdk \
+    maven \
+    gradle \
+    nodejs \
+    npm \
+    yarn \
+    pnpm \
+    golang-go \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configurar Python
+RUN python3 -m pip install --upgrade pip setuptools wheel
+
+# Stage 2: Instalar ferramentas de segurança
+FROM base as security-tools
+
+# Instalar Semgrep
+RUN pip3 install semgrep
+
+# Instalar GitLeaks
+RUN go install github.com/gitleaks/gitleaks/v8/cmd/gitleaks@latest
+
+# Instalar TruffleHog
+RUN pip3 install trufflehog
+
+# Instalar pip-audit
+RUN pip3 install pip-audit
+
+# Stage 3: Configuração final
+FROM security-tools as final
+
+# Configurar PATH
+ENV PATH="/root/go/bin:$PATH"
+
+# Criar diretório de trabalho
+WORKDIR /workspace
+
+# Copiar scripts de hooks
+COPY hooks/ /hooks/
+
+# Tornar scripts executáveis
+RUN chmod +x /hooks/*.sh
+
+# Configurar Git (necessário para hooks)
+RUN git config --global user.name "Git Hooks" && \
+    git config --global user.email "hooks@example.com"
+
+# Verificar instalações
+RUN echo "=== VERIFICANDO FERRAMENTAS INSTALADAS ===" && \
+    echo "Semgrep:" && semgrep --version && \
+    echo "GitLeaks:" && gitleaks version && \
+    echo "TruffleHog:" && trufflehog --version && \
+    echo "Node.js:" && node --version && \
+    echo "npm:" && npm --version && \
+    echo "Java:" && java -version && \
+    echo "Maven:" && mvn --version && \
+    echo "Gradle:" && gradle --version && \
+    echo "pip-audit:" && pip-audit --version
+
+# Comando padrão
+CMD ["/bin/bash"]
