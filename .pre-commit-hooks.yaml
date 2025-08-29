@@ -1,3 +1,9 @@
+- id: security-pre-push-hook
+  name: Security Pre-Push Hook
+  entry: hooks/security_pre_push.sh
+  language: script
+  stages: [pre-push]
+
 - id: branch-ahead-check
   name: Verifica se a branch está atualizada em relação à default
   entry: hooks/branch_ahead_check.sh
