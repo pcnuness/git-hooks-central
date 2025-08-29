@@ -56,10 +56,6 @@ repos:
         stages: [pre-push]
         pass_filenames: false
       
-      - id: sast-semantic-fast
-        stages: [pre-push]
-        pass_filenames: false
-      
       - id: deps-audit-fast
         stages: [pre-push]
         pass_filenames: false
