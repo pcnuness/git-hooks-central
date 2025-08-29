@@ -185,7 +185,7 @@ run_node_sast() {
     # Semgrep para JavaScript/TypeScript
     if command_exists semgrep; then
         log "INFO" "Executando Semgrep para Node.js..."
-        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60 .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60; then
             log "SUCCESS" "Semgrep SAST concluído sem problemas críticos"
         else
             log "ERROR" "Semgrep SAST encontrou problemas de segurança"
