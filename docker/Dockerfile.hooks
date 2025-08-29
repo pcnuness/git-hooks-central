@@ -54,8 +54,8 @@ ENV PATH="/root/go/bin:$PATH"
 # Criar diretório de trabalho
 WORKDIR /workspace
 
-# Copiar scripts de hooks
-COPY hooks/ /hooks/
+# Copiar scripts de hooks (contexto do diretório pai)
+COPY ../hooks/ /hooks/
 
 # Tornar scripts executáveis
 RUN chmod +x /hooks/*.sh

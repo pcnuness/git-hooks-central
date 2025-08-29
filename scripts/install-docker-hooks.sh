@@ -72,8 +72,8 @@ build_docker_image() {
         exit 1
     fi
     
-    # Construir imagem
-    if docker build -f docker/Dockerfile.hooks -t git-hooks-central:latest docker/; then
+    # Construir imagem (contexto do diretório raiz)
+    if docker build -f docker/Dockerfile.hooks -t git-hooks-central:latest .; then
         log "SUCCESS" "Imagem Docker construída com sucesso!"
     else
         log "ERROR" "Falha ao construir imagem Docker"
@@ -133,7 +133,7 @@ fi
 # Verificar se imagem existe
 if ! docker image inspect git-hooks-central:latest >/dev/null 2>&1; then
     echo "🔨 Construindo imagem Docker..."
-    docker build -f docker/Dockerfile.hooks -t git-hooks-central:latest docker/
+    docker build -f docker/Dockerfile.hooks -t git-hooks-central:latest .
 fi
 
 echo "✅ Hooks Docker prontos para uso!"
