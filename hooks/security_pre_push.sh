@@ -44,6 +44,21 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Função para timeout compatível com macOS
+timeout_cmd() {
+    local duration="$1"
+    shift
+    
+    if command_exists timeout; then
+        timeout "$duration" "$@"
+    elif command_exists gtimeout; then
+        gtimeout "$duration" "$@"
+    else
+        # Fallback para macOS sem timeout
+        "$@"
+    fi
+}
+
 # Função para detectar o tipo de projeto
 detect_project_type() {
     if [[ -f "pom.xml" || -f "build.gradle" || -f "build.gradle.kts" ]]; then
@@ -143,7 +158,7 @@ run_java_sast() {
     # Semgrep para Java (OWASP Top 10)
     if command_exists semgrep; then
         log "INFO" "Executando Semgrep (OWASP Top 10)..."
-        if timeout "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --error --timeout 60 .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60 .; then
             log "SUCCESS" "Semgrep SAST concluído sem problemas críticos"
         else
             log "ERROR" "Semgrep SAST encontrou problemas de segurança"
@@ -156,7 +171,7 @@ run_java_sast() {
     # SpotBugs (se disponível)
     if command_exists spotbugs; then
         log "INFO" "Executando SpotBugs..."
-        if timeout "$TIMEOUT_SECONDS" spotbugs -textui -effort:max -low .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" spotbugs -textui -effort:max -low .; then
             log "SUCCESS" "SpotBugs SAST concluído"
         else
             log "WARNING" "SpotBugs encontrou problemas (não crítico para push)"
@@ -170,7 +185,7 @@ run_node_sast() {
     # Semgrep para JavaScript/TypeScript
     if command_exists semgrep; then
         log "INFO" "Executando Semgrep para Node.js..."
-        if timeout "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --error --timeout 60 .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60 .; then
             log "SUCCESS" "Semgrep SAST concluído sem problemas críticos"
         else
             log "ERROR" "Semgrep SAST encontrou problemas de segurança"
@@ -183,7 +198,7 @@ run_node_sast() {
     # ESLint security plugin (se configurado)
     if [[ -f ".eslintrc" ]] && command_exists eslint; then
         log "INFO" "Executando ESLint com regras de segurança..."
-        if timeout "$TIMEOUT_SECONDS" eslint --ext .js,.jsx,.ts,.tsx .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" eslint --ext .js,.jsx,.ts,.tsx .; then
             log "SUCCESS" "ESLint security check concluído"
         else
             log "WARNING" "ESLint encontrou problemas (não crítico para push)"
@@ -217,7 +232,7 @@ run_java_dependency_scanning() {
     # OWASP Dependency-Check (se disponível)
     if command_exists dependency-check; then
         log "INFO" "Executando OWASP Dependency-Check..."
-        if timeout "$TIMEOUT_SECONDS" dependency-check --scan . --format HTML --out .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" dependency-check --scan . --format HTML --out .; then
             log "SUCCESS" "OWASP Dependency-Check concluído"
         else
             log "WARNING" "OWASP Dependency-Check encontrou vulnerabilidades"
@@ -230,7 +245,7 @@ run_java_dependency_scanning() {
     # Gradle dependency check (se for projeto Gradle)
     if [[ -f "build.gradle" || -f "build.gradle.kts" ]] && command_exists gradle; then
         log "INFO" "Executando Gradle dependency check..."
-        if timeout "$TIMEOUT_SECONDS" gradle dependencyCheckAnalyze; then
+        if timeout_cmd "$TIMEOUT_SECONDS" gradle dependencyCheckAnalyze; then
             log "SUCCESS" "Gradle dependency check concluído"
         else
             log "WARNING" "Gradle dependency check encontrou problemas"
@@ -244,7 +259,7 @@ run_node_dependency_scanning() {
     # npm audit
     if command_exists npm; then
         log "INFO" "Executando npm audit..."
-        if timeout "$TIMEOUT_SECONDS" npm audit --audit-level=high; then
+        if timeout_cmd "$TIMEOUT_SECONDS" npm audit --audit-level=high; then
             log "SUCCESS" "npm audit concluído sem vulnerabilidades críticas"
         else
             log "ERROR" "npm audit encontrou vulnerabilidades críticas"
@@ -255,7 +270,7 @@ run_node_dependency_scanning() {
     # yarn audit (se for projeto yarn)
     if [[ -f "yarn.lock" ]] && command_exists yarn; then
         log "INFO" "Executando yarn audit..."
-        if timeout "$TIMEOUT_SECONDS" yarn audit --level high; then
+        if timeout_cmd "$TIMEOUT_SECONDS" yarn audit --level high; then
             log "SUCCESS" "yarn audit concluído sem vulnerabilidades críticas"
         else
             log "ERROR" "yarn audit encontrou vulnerabilidades críticas"
@@ -266,7 +281,7 @@ run_node_dependency_scanning() {
     # pnpm audit (se for projeto pnpm)
     if [[ -f "pnpm-lock.yaml" ]] && command_exists pnpm; then
         log "INFO" "Executando pnpm audit..."
-        if timeout "$TIMEOUT_SECONDS" pnpm audit --audit-level high; then
+        if timeout_cmd "$TIMEOUT_SECONDS" pnpm audit --audit-level high; then
             log "SUCCESS" "pnpm audit concluído sem vulnerabilidades críticas"
         else
             log "ERROR" "pnpm audit encontrou vulnerabilidades críticas"
@@ -287,7 +302,7 @@ run_secret_detection() {
     # GitLeaks (se disponível)
     if command_exists gitleaks; then
         log "INFO" "Executando GitLeaks..."
-        if timeout "$TIMEOUT_SECONDS" gitleaks detect --source . --verbose; then
+        if timeout_cmd "$TIMEOUT_SECONDS" gitleaks detect --source . --verbose; then
             log "SUCCESS" "GitLeaks não encontrou secrets expostos"
         else
             log "ERROR" "GitLeaks encontrou secrets expostos"
@@ -300,7 +315,7 @@ run_secret_detection() {
     # TruffleHog (se disponível)
     if command_exists trufflehog; then
         log "INFO" "Executando TruffleHog..."
-        if timeout "$TIMEOUT_SECONDS" trufflehog --only-verified --fail .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" trufflehog --only-verified --fail .; then
             log "SUCCESS" "TruffleHog não encontrou secrets expostos"
         else
             log "ERROR" "TruffleHog encontrou secrets expostos"

@@ -1,6 +1,7 @@
 # Configuração ArgoCD para validação pre-commit
 # Copie este arquivo para argocd-application.yaml e ajuste conforme necessário
 
+# Exemplo de Application do ArgoCD
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -27,238 +28,167 @@ spec:
       - PruneLast=true
   revisionHistoryLimit: 10
 
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: pre-commit-validation
-  labels:
-    app: pre-commit-validation
-    argocd.argoproj.io/instance: pre-commit-validation
+# Exemplo de Namespace
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: pre-commit-validation
+#   labels:
+#     app: pre-commit-validation
+#     argocd.argoproj.io/instance: pre-commit-validation
 
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: pre-commit-validator
-  namespace: pre-commit-validation
-  labels:
-    app: pre-commit-validator
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: pre-commit-validator
-  template:
-    metadata:
-      labels:
-        app: pre-commit-validator
-    spec:
-      containers:
-        - name: pre-commit-validator
-          image: python:3.11-slim
-          command: ["/bin/bash"]
-          args:
-            - -c
-            - |
-              echo "🔧 Configurando ambiente..."
-              python -m pip install --upgrade pip
-              pip install pre-commit
-              echo "📥 Instalando hooks pre-commit..."
-              pre-commit install --hook-type pre-push
-              echo "🔍 Executando validação pre-commit..."
-              pre-commit run --all-files --hook-stage push -v
-              echo "✅ Validação pre-commit concluída com sucesso"
-              # Manter container rodando para debugging
-              tail -f /dev/null
-          volumeMounts:
-            - name: git-repo
-              mountPath: /workspace
-            - name: pip-cache
-              mountPath: /root/.cache/pip
-            - name: pre-commit-cache
-              mountPath: /root/.cache/pre-commit
-          workingDir: /workspace
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-        - name: jq-validator
-          image: alpine:latest
-          command: ["/bin/sh"]
-          args:
-            - -c
-            - |
-              echo "🔍 Validando artefato de auditoria..."
-              apk add --no-cache jq
-              if [ -f /workspace/.git/hooks_artifacts/prepush.json ]; then
-                echo "📄 Artefato encontrado:"
-                cat /workspace/.git/hooks_artifacts/prepush.json
-                echo ""
-                echo "🔍 Validando estrutura do artefato..."
-                jq -e '.commit and .author and .date and .precommit_config_sha1 and .status == "passed-local"' /workspace/.git/hooks_artifacts/prepush.json
-                echo "✅ Artefato de auditoria válido"
-              else
-                echo "⚠️ Artefato de auditoria não encontrado"
-                echo "ℹ️ Isso pode indicar que os hooks não foram executados localmente"
-                exit 1
-              fi
-              # Manter container rodando para debugging
-              tail -f /dev/null
-          volumeMounts:
-            - name: git-repo
-              mountPath: /workspace
-          workingDir: /workspace
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
-      volumes:
-        - name: git-repo
-          emptyDir: {}
-        - name: pip-cache
-          emptyDir: {}
-        - name: pre-commit-cache
-          emptyDir: {}
+# Exemplo de Deployment
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: pre-commit-validator
+#   namespace: pre-commit-validation
+#   labels:
+#     app: pre-commit-validator
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: pre-commit-validator
+#   template:
+#     metadata:
+#       labels:
+#         app: pre-commit-validator
+#     spec:
+#       containers:
+#         - name: pre-commit-validator
+#           image: python:3.11-slim
+#           command: ["/bin/bash"]
+#           args:
+#             - -c
+#             - |
+#               echo "🔧 Configurando ambiente..."
+#               python -m pip install --upgrade pip
+#               pip install pre-commit
+#               echo "📥 Instalando hooks pre-commit..."
+#               pre-commit install --hook-type pre-push
+#               echo "🔍 Executando validação pre-commit..."
+#               pre-commit run --all-files --hook-stage push -v
+#               echo "✅ Validação pre-commit concluída com sucesso"
+#           workingDir: /workspace
+#           resources:
+#             requests:
+#               memory: "256Mi"
+#               cpu: "250m"
+#             limits:
+#               memory: "512Mi"
+#               cpu: "500m"
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pre-commit-validator-service
-  namespace: pre-commit-validation
-  labels:
-    app: pre-commit-validator
-spec:
-  selector:
-    app: pre-commit-validator
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  type: ClusterIP
+# Exemplo de Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: pre-commit-validator-service
+#   namespace: pre-commit-validation
+#   labels:
+#     app: pre-commit-validator
+# spec:
+#   selector:
+#     app: pre-commit-validator
+#   ports:
+#     - protocol: TCP
+#       port: 8080
+#       targetPort: 8080
+#   type: ClusterIP
 
----
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: pre-commit-validation-cron
-  namespace: pre-commit-validation
-  labels:
-    app: pre-commit-validation
-spec:
-  schedule: "0 2 * * *"  # Executar diariamente às 2h da manhã
-  concurrencyPolicy: Forbid
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: pre-commit-validator
-              image: python:3.11-slim
-              command: ["/bin/bash"]
-              args:
-                - -c
-                - |
-                  echo "🔧 Configurando ambiente..."
-                  python -m pip install --upgrade pip
-                  pip install pre-commit
-                  echo "📥 Instalando hooks pre-commit..."
-                  pre-commit install --hook-type pre-push
-                  echo "🔍 Executando validação pre-commit..."
-                  pre-commit run --all-files --hook-stage push -v
-                  echo "✅ Validação pre-commit concluída com sucesso"
-              volumeMounts:
-                - name: git-repo
-                  mountPath: /workspace
-                - name: pip-cache
-                  mountPath: /root/.cache/pip
-                - name: pre-commit-cache
-                  mountPath: /root/.cache/pre-commit
-              workingDir: /workspace
-              resources:
-                requests:
-                  memory: "256Mi"
-                  cpu: "250m"
-                limits:
-                  memory: "512Mi"
-                  cpu: "500m"
-          volumes:
-            - name: git-repo
-              emptyDir: {}
-            - name: pip-cache
-              emptyDir: {}
-            - name: pre-commit-cache
-              emptyDir: {}
-          restartPolicy: OnFailure
-          activeDeadlineSeconds: 1800  # 30 minutos
+# Exemplo de CronJob
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: pre-commit-validation-cron
+#   namespace: pre-commit-validation
+#   labels:
+#     app: pre-commit-validation
+# spec:
+#   schedule: "0 2 * * *"  # Executar diariamente às 2h da manhã
+#   concurrencyPolicy: Forbid
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#           containers:
+#             - name: pre-commit-validator
+#               image: python:3.11-slim
+#               command: ["/bin/bash"]
+#               args:
+#                 - -c
+#                 - |
+#                   echo "🔧 Configurando ambiente..."
+#                   python -m pip install --upgrade pip
+#                   pip install pre-commit
+#                   echo "📥 Instalando hooks pre-commit..."
+#                   pre-commit install --hook-type pre-push
+#                   echo "🔍 Executando validação pre-commit..."
+#                   pre-commit run --all-files --hook-stage push -v
+#                   echo "✅ Validação pre-commit concluída com sucesso"
+#           restartPolicy: OnFailure
+#           activeDeadlineSeconds: 1800  # 30 minutos
 
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pre-commit-config
-  namespace: pre-commit-validation
-  labels:
-    app: pre-commit-validation
-data:
-  pre-commit-config.yaml: |
-    repos:
-      - repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v6.0.0
-        hooks:
-          - id: end-of-file-fixer
-            stages: [pre-push]
-          - id: check-json
-            stages: [pre-push]
-          - id: check-xml
-            stages: [pre-push]
-          - id: check-yaml
-            stages: [pre-push]
-          - id: detect-private-key
-            stages: [pre-push]
-          - id: detect-secrets
-            stages: [pre-push]
-      
-      - repo: https://github.com/pcnuness/git-hooks-central.git
-        rev: v1.0.0
-        hooks:
-          - id: audit-trail
-            stages: [pre-push]
-            pass_filenames: false
-            always_run: true
-          
-          - id: branch-ahead-check
-            stages: [pre-push]
-            pass_filenames: false
-            always_run: true
-          
-          - id: deps-audit-fast
-            stages: [pre-push]
-            pass_filenames: false
-          
-          - id: sast-semantic-fast
-            stages: [pre-push]
-            pass_filenames: false
+# Exemplo de ConfigMap
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: pre-commit-config
+#   namespace: pre-commit-validation
+#   labels:
+#     app: pre-commit-validation
+# data:
+#   pre-commit-config.yaml: |
+#     repos:
+#       - repo: https://github.com/pre-commit/pre-commit-hooks
+#         rev: v6.0.0
+#         hooks:
+#           - id: end-of-file-fixer
+#             stages: [pre-push]
+#           - id: check-json
+#             stages: [pre-push]
+#           - id: check-xml
+#             stages: [pre-push]
+#           - id: check-yaml
+#             stages: [pre-push]
+#           - id: detect-private-key
+#             stages: [pre-push]
+#           - id: detect-secrets
+#             stages: [pre-push]
+#       
+#       - repo: https://github.com/pcnuness/git-hooks-central.git
+#         rev: v1.0.0
+#         hooks:
+#           - id: audit-trail
+#             stages: [pre-push]
+#             pass_filenames: false
+#             always_run: true
+#           
+#           - id: branch-ahead-check
+#             stages: [pre-push]
+#             pass_filenames: false
+#             always_run: true
+#           
+#           - id: deps-audit-fast
+#             stages: [pre-push]
+#             pass_filenames: false
+#           
+#           - id: sast-semantic-fast
+#             stages: [pre-push]
+#             pass_filenames: false
 
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pre-commit-secrets
-  namespace: pre-commit-validation
-  labels:
-    app: pre-commit-validation
-type: Opaque
-data:
-  # Base64 encoded secrets
-  # Exemplo: echo -n "your-secret" | base64
-  git-ssh-key: ""  # Chave SSH para repositórios privados
-  git-username: ""  # Usuário Git
-  git-password: ""  # Senha Git ou token
+# Exemplo de Secret
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: pre-commit-secrets
+#   namespace: pre-commit-validation
+#   labels:
+#     app: pre-commit-validation
+# type: Opaque
+# data:
+#   # Base64 encoded secrets
+#   # Exemplo: echo -n "your-secret" | base64
+#   git-ssh-key: ""  # Chave SSH para repositórios privados
+#   git-username: ""  # Usuário Git
+#   git-password: ""  # Senha Git ou token
