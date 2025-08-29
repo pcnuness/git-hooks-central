@@ -50,7 +50,7 @@ timeout_cmd() {
     shift
     
     if command_exists timeout; then
-        timeout "$duration" "$@"
+        /usr/bin/timeout "$duration" "$@"
     elif command_exists gtimeout; then
         gtimeout "$duration" "$@"
     else
@@ -158,7 +158,7 @@ run_java_sast() {
     # Semgrep para Java (OWASP Top 10)
     if command_exists semgrep; then
         log "INFO" "Executando Semgrep (OWASP Top 10)..."
-        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60 .; then
+        if timeout_cmd "$TIMEOUT_SECONDS" semgrep ci --config p/owasp-top-ten --timeout 60; then
             log "SUCCESS" "Semgrep SAST concluído sem problemas críticos"
         else
             log "ERROR" "Semgrep SAST encontrou problemas de segurança"
