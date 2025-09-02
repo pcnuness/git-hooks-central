@@ -40,7 +40,7 @@
 - id: secrets-detection-gitlab
   name: Secrets Detection (GitLab Analyzer)
   description: Detecta segredos usando a imagem Docker oficial do GitLab Analyzer
-  entry: registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest ./analyzer run
+  entry: registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest /analyzer run
   language: docker_image
   stages: [pre-push]
   always_run: true
