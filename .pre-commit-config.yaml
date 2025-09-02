@@ -13,3 +13,12 @@ repos:
         stages: [pre-push]
       - id: detect-private-key
         stages: [pre-push]
+
+  - repo: https://github.com/pcnuness/git-hooks-central.git
+    rev: v1.0.2
+    hooks:
+      - id: secrets-detection-gitlab
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+      

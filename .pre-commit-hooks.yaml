@@ -43,5 +43,11 @@
   entry: registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest /analyzer run
   language: docker_image
   stages: [pre-push]
+  args:
+  - --log-level=fatal
+  - --severity=low
+  - --confidence=low
+  - --exit-on-find
+  - --format=json
   always_run: true
   pass_filenames: false
