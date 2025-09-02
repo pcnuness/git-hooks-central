@@ -146,3 +146,11 @@ build/reports/
 .dependency-check/
 # Semgrep cache
 .semgrep/
+
+# Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+!.venv/*
