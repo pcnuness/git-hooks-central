@@ -493,5 +493,3 @@ Este catálogo central inclui um hook de detecção de segredos baseado no GitLa
 
 ### Pré-requisitos
 - Docker em execução (Desktop no macOS/Windows; Engine no Linux)
-
-
