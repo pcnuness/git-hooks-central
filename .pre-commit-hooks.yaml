@@ -21,15 +21,27 @@
   entry: hooks/branch_ahead_check.sh
   language: script
   stages: [pre-push]
+  pass_filenames: false
 
 - id: deps-audit-fast
   name: Dependency audit rápido por stack
   entry: hooks/deps_audit_fast.sh
   language: script
   stages: [pre-push]
+  pass_filenames: false
 
 - id: audit-trail
   name: Salva resultado auditável para o CI
   entry: hooks/audit_trail.sh
   language: script
   stages: [pre-push]
+  pass_filenames: false
+
+- id: secrets-detection-gitlab
+  name: Secrets Detection (GitLab Analyzer)
+  description: Detecta segredos usando a imagem Docker oficial do GitLab Analyzer
+  entry: registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest ./analyzer run
+  language: docker_image
+  stages: [pre-push]
+  always_run: true
+  pass_filenames: false

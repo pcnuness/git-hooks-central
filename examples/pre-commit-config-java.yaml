@@ -12,11 +12,10 @@ repos:
         stages: [pre-push]
       - id: check-yaml
         stages: [pre-push]
+      - id: check-json
+        stages: [pre-push]
       - id: detect-private-key
         stages: [pre-push]
-      - id: detect-secrets
-        stages: [pre-push]
-        args: [--baseline, .secrets.baseline]
 
   # Catálogo central de hooks de segurança (SEMPRE usar tag específica)
   - repo: https://github.com/pcnuness/git-hooks-central.git
@@ -27,6 +26,11 @@ repos:
         always_run: true
         pass_filenames: false
       
+      - id: secrets-detection-gitlab
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+
       - id: branch-ahead-check
         stages: [pre-push]
         pass_filenames: false

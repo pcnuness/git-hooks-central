@@ -24,6 +24,11 @@ repos:
         always_run: true
         pass_filenames: false
       
+      - id: secrets-detection-gitlab
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+      
       - id: branch-ahead-check
         stages: [pre-push]
         pass_filenames: false
@@ -41,7 +46,7 @@ repos:
     rev: v9.34.0
     hooks:
       - id: eslint
-        additional_dependencies: ['eslint@9.9.0', '@eslint/js', 'globals']
+        additional_dependencies: ['eslint@9.9.0']
         files: \.(js|jsx|ts|tsx)$
         stages: [pre-push]
         args: [--fix]

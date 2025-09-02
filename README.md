@@ -457,3 +457,41 @@ git commit -m "chore(pre-commit): atualiza git-hooks-central para v1.1.0"
 ```
 =======
 >>>>>>> parent of 1740c05 (initial project)
+
+## 🔐 Detecção de Segredos (GitLab Analyzer)
+
+Este catálogo central inclui um hook de detecção de segredos baseado no GitLab Secrets Analyzer, executado via Docker, para impedir pushes com credenciais acidentalmente commitadas.
+
+- **Imagem**: `registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest`
+- **Hook**: `secrets-detection-gitlab` (stages: `pre-push`)
+- **Execução**: `./analyzer run` dentro do container, com o repositório montado em `/code`
+
+### Como habilitar (exemplo Node.js)
+```yaml
+- repo: https://github.com/pcnuness/git-hooks-central.git
+  rev: v1.0.3
+  hooks:
+    - id: secrets-detection-gitlab
+      stages: [pre-push]
+      always_run: true
+      pass_filenames: false
+```
+
+### O que acontece quando encontra um segredo?
+- O push é bloqueado com mensagem de erro
+- Você verá instruções para remover/rotacionar o segredo
+
+### Como corrigir
+1. Remova o valor sensível do código/configuração
+2. Rotacione a credencial no provedor (AWS, GitHub, etc.)
+3. Regrave o histórico se necessário (caso tenha sido commitado):
+   ```bash
+   git reset HEAD~1  # ou git revert <commit>
+   ```
+4. Use variáveis de ambiente/secret manager (AWS Secrets Manager, SSM, Vault)
+5. Refaça o commit e tente o push novamente
+
+### Pré-requisitos
+- Docker em execução (Desktop no macOS/Windows; Engine no Linux)
+
+
