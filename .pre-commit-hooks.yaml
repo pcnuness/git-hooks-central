@@ -1,31 +1,6 @@
-- id: security-pre-push-hook
-  name: Security Pre-Push Hook
-  description: Executa verificações de segurança e conformidade para Java e Node
-  entry: hooks/security_pre_push.sh
-  language: script
-  stages: [pre-push]
-  always_run: true
-  pass_filenames: false
-
-- id: security-pre-push-hook-docker
-  name: Security Pre-Push Hook (Docker)
-  description: Executa verificações de segurança via Docker (compatível Mac/Linux/Windows)
-  entry: hooks/security_pre_push_docker.sh
-  language: script
-  stages: [pre-push]
-  always_run: true
-  pass_filenames: false
-
 - id: branch-ahead-check
   name: Verifica se a branch está atualizada em relação à default
   entry: hooks/branch_ahead_check.sh
-  language: script
-  stages: [pre-push]
-  pass_filenames: false
-
-- id: deps-audit-fast
-  name: Dependency audit rápido por stack
-  entry: hooks/deps_audit_fast.sh
   language: script
   stages: [pre-push]
   pass_filenames: false
