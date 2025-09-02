@@ -44,10 +44,7 @@
   language: docker_image
   stages: [pre-push]
   args:
-  - --log-level=fatal
-  - --severity=low
-  - --confidence=low
-  - --exit-on-find
-  - --format=json
+  - --full-scan
+  - --excluded-paths=node_modules,dist,build,.git
   always_run: true
   pass_filenames: false
