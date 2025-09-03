@@ -44,7 +44,7 @@ class VirtualEnvironmentManager:
         self.project_root = project_root
         self.venv_path = project_root / ".venv"
         self.venv_python = self._get_venv_python()
-        self.requirements_file = project_root / "requirements.txt"
+        self.gitignore_file = project_root / ".gitignore"
     
     def _get_venv_python(self) -> Path:
         """Obtém o caminho do Python no virtual environment"""
@@ -65,49 +65,58 @@ class VirtualEnvironmentManager:
             print(f"[ERROR] Falha ao criar virtual environment: {e}")
             return False
     
-    def install_requirements(self) -> bool:
-        """Instala as dependências do requirements.txt"""
-        if not self.requirements_file.exists():
-            self._create_default_requirements()
-        
+    def setup_gitignore(self) -> bool:
+        """Configura o .gitignore para ignorar arquivos do virtual environment e relatórios"""
         try:
-            cmd = [str(self.venv_python), "-m", "pip", "install", "-r", str(self.requirements_file)]
-            subprocess.run(cmd, check=True, capture_output=True)
+            # Verificar se .gitignore existe
+            if not self.gitignore_file.exists():
+                # Criar .gitignore básico
+                with open(self.gitignore_file, 'w', encoding='utf-8') as f:
+                    f.write("# Virtual Environment\n")
+                    f.write(".venv/\n")
+                    f.write("__pycache__/\n")
+                    f.write("*.pyc\n")
+                    f.write("*.pyo\n")
+                    f.write("*.pyd\n")
+                    f.write(".Python\n")
+                    f.write("\n")
+                    f.write("# Secrets Detection Reports\n")
+                    f.write("gl-secret-detection-report.json\n")
+                    f.write("*.secret-report.json\n")
+                    f.write("\n")
+                    f.write("# IDE\n")
+                    f.write(".vscode/\n")
+                    f.write(".idea/\n")
+                    f.write("*.swp\n")
+                    f.write("*.swo\n")
+                    f.write("\n")
+                    f.write("# OS\n")
+                    f.write(".DS_Store\n")
+                    f.write("Thumbs.db\n")
+            else:
+                # Verificar se as regras já existem
+                with open(self.gitignore_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Adicionar regras se não existirem
+                rules_to_add = []
+                
+                if ".venv/" not in content:
+                    rules_to_add.append(".venv/")
+                
+                if "gl-secret-detection-report.json" not in content:
+                    rules_to_add.append("gl-secret-detection-report.json")
+                
+                if rules_to_add:
+                    with open(self.gitignore_file, 'a', encoding='utf-8') as f:
+                        f.write("\n# Secrets Detection (adicionado automaticamente)\n")
+                        for rule in rules_to_add:
+                            f.write(f"{rule}\n")
+            
             return True
-        except subprocess.CalledProcessError as e:
-            print(f"[ERROR] Falha ao instalar dependências: {e}")
+        except Exception as e:
+            print(f"[ERROR] Falha ao configurar .gitignore: {e}")
             return False
-    
-    def _create_default_requirements(self):
-        """Cria um requirements.txt padrão se não existir"""
-        requirements_content = """# Dependências para Secrets Detection Wrapper
-# Python 3.6+ é necessário
-
-# Para parsing JSON (já incluído no Python 3.6+)
-# json
-
-# Para subprocess (já incluído no Python 3.6+)
-# subprocess
-
-# Para pathlib (já incluído no Python 3.6+)
-# pathlib
-
-# Para venv (já incluído no Python 3.6+)
-# venv
-
-# Para platform (já incluído no Python 3.6+)
-# platform
-
-# Para typing (já incluído no Python 3.6+)
-# typing
-
-# Dependências opcionais para melhor performance
-# docker>=6.0.0  # Para interação com Docker API (opcional)
-# requests>=2.25.0  # Para requisições HTTP (opcional)
-"""
-        with open(self.requirements_file, 'w', encoding='utf-8') as f:
-            f.write(requirements_content)
-
 
 class SecretsDetector:
     """Detector de segredos usando GitLab Analyzer"""
@@ -259,15 +268,15 @@ class SecretsDetector:
             return False
     
     def setup_environment(self) -> bool:
-        """Configura o ambiente (virtual environment e dependências)"""
+        """Configura o ambiente (virtual environment e .gitignore)"""
         self.log("INFO", "Configurando ambiente Python...")
         
         # Criar virtual environment
         if not self.venv_manager.create_venv():
             return False
         
-        # Instalar dependências
-        if not self.venv_manager.install_requirements():
+        # Configurar .gitignore
+        if not self.venv_manager.setup_gitignore():
             return False
         
         self.log("SUCCESS", "Ambiente Python configurado com sucesso")

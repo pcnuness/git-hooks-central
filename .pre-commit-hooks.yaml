@@ -12,27 +12,11 @@
   stages: [pre-push]
   pass_filenames: false
 
-- id: secrets-detection-company-bash
-  name: Secrets Detection (GitLab Analyzer)
-  description: Detecta segredos usando a imagem Docker oficial do GitLab Analyzer (Python Multi-OS)
-  entry: hooks/secrets_detection_wrapper.bash
-  language: script
-  stages: [pre-push]
-  always_run: true
-  pass_filenames: false
-
-- id: secrets-detection-company-python
+- id: secrets-detection-gitlab
   name: Secrets Detection (GitLab Analyzer)
   description: Detecta segredos usando a imagem Docker oficial do GitLab Analyzer (Python Multi-OS)
   entry: hooks/secrets_detection_wrapper.py
   language: script
   stages: [pre-push]
   always_run: true
-  pass_filenames: false
-
-- id: gitleaks-docker
-  name: Detect hardcoded secrets
-  description: Detect hardcoded secrets using Gitleaks
-  entry: zricethezav/gitleaks git --pre-commit --redact --staged --verbose
-  language: docker_image
   pass_filenames: false

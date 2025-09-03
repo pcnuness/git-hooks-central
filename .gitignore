@@ -147,10 +147,7 @@ build/reports/
 # Semgrep cache
 .semgrep/
 
-# Python virtual environment
-.venv/
-venv/
-env/
-ENV/
-
 !.venv/*
+!path/*
+# Secrets Detection (adicionado automaticamente)
+gl-secret-detection-report.json
