@@ -227,36 +227,35 @@ git push origin v1.1.0
 # 6. Comunicar mudanças
 ```
 
+#### **Processo de Atualização da Tag Latest**
+```bash
+# 1. Listar tags existentes
+git tag                        
+git ls-remote --tags origin 
+
+# 2. Deletar tag latest (se existir)
+git tag -d latest
+git push origin --delete latest
+
+# 3. Criar nova tag latest
+git add -A
+git commit -m "Release: secret detection"
+git tag -a latest -m "Release: secret detection"
+
+# 4. Push da tag e commits
+git push origin latest  
+git push
+```
+
+**⚠️ Importante**: A tag `latest` deve ser usada apenas para releases estáveis e testadas. Sempre teste localmente antes de atualizar a tag `latest`.
+
 ### **Matriz de Compatibilidade**
 
 | Versão | Python | Docker | pre-commit | Status |
 |--------|--------|--------|------------|--------|
-| v1.0.3 | 3.6+ | 20.0+ | 3.0+ | ✅ Atual |
-| v1.0.2 | 3.6+ | 20.0+ | 3.0+ | ✅ Suportada |
-| v1.0.1 | 3.6+ | 20.0+ | 3.0+ | ⚠️ Deprecada |
-| v1.0.0 | 3.6+ | 20.0+ | 3.0+ | ❌ Descontinuada |
+| latest | 3.6+ | 20.0+ | 3.0+ | ✅ Atual |
 
 ### **Plano de Atualização**
-
-#### **Atualização Automática (Recomendado)**
-```bash
-# Script de atualização automática
-#!/bin/bash
-# update-hooks.sh
-
-CURRENT_VERSION=$(grep "rev: v" .pre-commit-config.yaml | cut -d' ' -f2)
-LATEST_VERSION=$(git ls-remote --tags https://github.com/pcnuness/git-hooks-central.git | tail -1 | cut -d'/' -f3)
-
-if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
-    echo "Atualizando de $CURRENT_VERSION para $LATEST_VERSION"
-    sed -i "s/$CURRENT_VERSION/$LATEST_VERSION/g" .pre-commit-config.yaml
-    pre-commit clean
-    pre-commit install --hook-type pre-push
-    echo "Atualização concluída!"
-else
-    echo "Já está na versão mais recente: $CURRENT_VERSION"
-fi
-```
 
 #### **Atualização Manual**
 ```bash
@@ -264,7 +263,7 @@ fi
 git ls-remote --tags https://github.com/pcnuness/git-hooks-central.git
 
 # 2. Atualizar .pre-commit-config.yaml
-# Mudar rev: v1.0.3 para rev: v1.1.0
+# Mudar rev: develop para rev: latest
 
 # 3. Limpar cache e reinstalar
 pre-commit clean
@@ -301,15 +300,7 @@ pre-commit run --all-files --hook-stage push
 #### **Estrutura de Logs**
 ```bash
 # Logs locais
-.git/hooks_artifacts/prepush.json
 gl-secret-detection-report.json
-
-# Logs centralizados (recomendado)
-/var/log/git-hooks/
-├── execution.log
-├── security.log
-├── errors.log
-└── audit.log
 ```
 
 #### **Configuração de Logs Centralizados**
@@ -356,239 +347,6 @@ echo "=== Top 5 Tipos de Segredos ==="
 find /path/to/projects -name "gl-secret-detection-report.json" -exec jq -r '.vulnerabilities[].name' {} \; | sort | uniq -c | sort -nr | head -5
 ```
 
----
-
-## 🔒 **Políticas de Segurança**
-
-### **Classificação de Segredos**
-
-#### **Níveis de Severidade**
-```bash
-# Critical: Chaves privadas, tokens de acesso
-# High: Senhas, API keys
-# Medium: Tokens de sessão, cookies
-# Low: URLs, configurações
-```
-
-#### **Ações por Severidade**
-```bash
-# Critical: BLOQUEAR push + Investigação imediata
-# High: BLOQUEAR push + Rotação de credenciais
-# Medium: ALERTAR + Revisão obrigatória
-# Low: LOGAR + Revisão opcional
-```
-
-### **Política de Resposta a Incidentes**
-
-#### **Processo de Resposta**
-```bash
-# 1. DETECÇÃO
-# - Hook detecta segredo
-# - Push é bloqueado
-# - Alerta é gerado
-
-# 2. ANÁLISE
-# - Classificar severidade
-# - Identificar tipo de segredo
-# - Rastrear origem
-
-# 3. CONTENÇÃO
-# - Rotacionar credenciais
-# - Bloquear acesso se necessário
-# - Notificar equipe de segurança
-
-# 4. ERADICAÇÃO
-# - Remover segredo do código
-# - Atualizar processos
-# - Treinar desenvolvedores
-
-# 5. RECUPERAÇÃO
-# - Validar correções
-# - Restaurar funcionalidades
-# - Monitorar continuamente
-
-# 6. LIÇÕES APRENDIDAS
-# - Documentar incidente
-# - Atualizar políticas
-# - Melhorar processos
-```
-
-### **Auditoria e Compliance**
-
-#### **Requisitos de Auditoria**
-```bash
-# 1. Logs de execução
-# - Timestamp de cada execução
-# - Resultado (pass/fail)
-# - Detalhes dos segredos detectados
-
-# 2. Rastreabilidade
-# - Quem executou o push
-# - Qual branch foi afetada
-# - Quais arquivos foram modificados
-
-# 3. Evidências
-# - Artefatos de auditoria
-# - Relatórios de segurança
-# - Logs de bypass (se houver)
-```
-
-#### **Relatórios de Compliance**
-```bash
-# Script de relatório mensal
-#!/bin/bash
-# monthly-report.sh
-
-MONTH=$(date +%Y-%m)
-REPORT_FILE="compliance-report-${MONTH}.md"
-
-cat > $REPORT_FILE << EOF
-# Relatório de Compliance - $MONTH
-
-## Resumo Executivo
-- Total de execuções: $(find /var/log/git-hooks -name "audit_${MONTH}*" | wc -l)
-- Taxa de sucesso: $(calculate_success_rate)
-- Segredos detectados: $(find /var/log/git-hooks -name "security_${MONTH}*" -exec jq '.vulnerabilities | length' {} \; | awk '{sum+=$1} END {print sum}')
-
-## Detalhes por Projeto
-$(generate_project_details)
-
-## Recomendações
-$(generate_recommendations)
-EOF
-```
-
----
-
-## 🔄 **Integração CI/CD**
-
-### **Estratégia de Integração**
-
-#### **1. Validação no Pipeline**
-```yaml
-# .github/workflows/security-validation.yml
-name: Security Validation
-
-on:
-  pull_request:
-    branches: [ main, develop ]
-
-jobs:
-  security-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install pre-commit
-      run: pip install pre-commit
-    
-    - name: Run security hooks
-      run: pre-commit run --all-files --hook-stage push
-    
-    - name: Validate audit artifact
-      run: |
-        if [ -f .git/hooks_artifacts/prepush.json ]; then
-          echo "✅ Audit artifact found"
-          # Validar integridade do artefato
-          jq '.status' .git/hooks_artifacts/prepush.json
-        else
-          echo "❌ Audit artifact missing"
-          exit 1
-        fi
-    
-    - name: Upload security reports
-      uses: actions/upload-artifact@v3
-      with:
-        name: security-reports
-        path: |
-          .git/hooks_artifacts/
-          gl-secret-detection-report.json
-```
-
-#### **2. Validação de Artefatos**
-```bash
-# Script de validação de artefatos
-#!/bin/bash
-# validate-artifacts.sh
-
-ARTIFACT_FILE=".git/hooks_artifacts/prepush.json"
-
-if [ ! -f "$ARTIFACT_FILE" ]; then
-    echo "❌ Audit artifact missing"
-    exit 1
-fi
-
-# Validar estrutura do JSON
-if ! jq empty "$ARTIFACT_FILE" 2>/dev/null; then
-    echo "❌ Invalid JSON format"
-    exit 1
-fi
-
-# Validar campos obrigatórios
-REQUIRED_FIELDS=("commit" "author" "date" "precommit_config_sha1" "status")
-for field in "${REQUIRED_FIELDS[@]}"; do
-    if ! jq -e ".$field" "$ARTIFACT_FILE" > /dev/null; then
-        echo "❌ Missing required field: $field"
-        exit 1
-    fi
-done
-
-# Validar status
-STATUS=$(jq -r '.status' "$ARTIFACT_FILE")
-if [ "$STATUS" != "passed-local" ]; then
-    echo "❌ Invalid status: $STATUS"
-    exit 1
-fi
-
-echo "✅ Audit artifact is valid"
-```
-
-### **Integração com Ferramentas de Segurança**
-
-#### **1. SIEM Integration**
-```bash
-# Script de integração com SIEM
-#!/bin/bash
-# siem-integration.sh
-
-# Coletar eventos de segurança
-find /path/to/projects -name "gl-secret-detection-report.json" -newer /tmp/last_siem_sync | while read file; do
-    # Enviar para SIEM
-    curl -X POST "$SIEM_ENDPOINT" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $SIEM_TOKEN" \
-        -d @"$file"
-done
-
-# Atualizar timestamp
-touch /tmp/last_siem_sync
-```
-
-#### **2. Slack Integration**
-```bash
-# Script de notificação Slack
-#!/bin/bash
-# slack-notification.sh
-
-SECRETS_COUNT=$(find /path/to/projects -name "gl-secret-detection-report.json" -exec jq '.vulnerabilities | length' {} \; | awk '{sum+=$1} END {print sum}')
-
-if [ "$SECRETS_COUNT" -gt 0 ]; then
-    curl -X POST "$SLACK_WEBHOOK" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"text\": \"🚨 $SECRETS_COUNT secrets detected in the last 24 hours\",
-            \"channel\": \"#security-alerts\"
-        }"
-fi
-```
-
----
-
 ## 🔧 **Troubleshooting Avançado**
 
 ### **Problemas de Performance**
@@ -597,11 +355,6 @@ fi
 ```bash
 # Diagnóstico
 time pre-commit run --all-files --hook-stage push
-
-# Otimizações
-# - Reduzir número de arquivos processados
-# - Usar cache do Docker
-# - Otimizar regras de detecção
 ```
 
 #### **2. Docker Overhead**
@@ -609,10 +362,6 @@ time pre-commit run --all-files --hook-stage push
 # Configurar cache do Docker
 docker system prune -f
 docker builder prune -f
-
-# Usar imagens menores
-# - Alpine Linux base
-# - Multi-stage builds
 ```
 
 ### **Problemas de Compatibilidade**
@@ -646,9 +395,6 @@ chmod +x hooks/*.py
 # Verificar conectividade
 docker pull registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest
 
-# Configurar proxy se necessário
-export HTTP_PROXY=http://proxy.company.com:8080
-export HTTPS_PROXY=http://proxy.company.com:8080
 ```
 
 #### **2. Falha no Acesso ao Repositório**
@@ -662,164 +408,7 @@ git config --global credential.helper store
 
 ---
 
-## 🔄 **Manutenção e Atualizações**
-
-### **Cronograma de Manutenção**
-
-#### **Diário**
-```bash
-# Verificar logs de erro
-grep -r "ERROR" /var/log/git-hooks/
-
-# Verificar espaço em disco
-df -h /var/log/git-hooks/
-
-# Verificar status do Docker
-docker system df
-```
-
-#### **Semanal**
-```bash
-# Limpeza de logs antigos
-find /var/log/git-hooks -name "*.json" -mtime +7 -delete
-
-# Atualização de imagens Docker
-docker pull registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:latest
-
-# Verificação de segurança
-security-scan.sh
-```
-
-#### **Mensal**
-```bash
-# Relatório de compliance
-monthly-report.sh
-
-# Atualização de dependências
-dependency-update.sh
-
-# Backup de configurações
-backup-configs.sh
-```
-
-### **Scripts de Manutenção**
-
-#### **1. Limpeza Automática**
-```bash
-#!/bin/bash
-# cleanup.sh
-
-# Limpar cache do pre-commit
-find /path/to/projects -name ".pre-commit" -type d -exec rm -rf {} +
-
-# Limpar virtual environments antigos
-find /path/to/projects -name ".venv" -type d -mtime +30 -exec rm -rf {} +
-
-# Limpar relatórios antigos
-find /path/to/projects -name "gl-secret-detection-report.json" -mtime +7 -delete
-
-# Limpar logs antigos
-find /var/log/git-hooks -name "*.json" -mtime +30 -delete
-```
-
-#### **2. Backup de Configurações**
-```bash
-#!/bin/bash
-# backup-configs.sh
-
-BACKUP_DIR="/backup/git-hooks/$(date +%Y%m%d)"
-mkdir -p "$BACKUP_DIR"
-
-# Backup de configurações
-find /path/to/projects -name ".pre-commit-config.yaml" -exec cp {} "$BACKUP_DIR/" \;
-
-# Backup de artefatos importantes
-find /path/to/projects -name "prepush.json" -exec cp {} "$BACKUP_DIR/" \;
-
-# Compressão
-tar -czf "$BACKUP_DIR.tar.gz" "$BACKUP_DIR"
-rm -rf "$BACKUP_DIR"
-```
-
-#### **3. Monitoramento de Saúde**
-```bash
-#!/bin/bash
-# health-check.sh
-
-# Verificar status dos serviços
-check_service() {
-    if systemctl is-active --quiet "$1"; then
-        echo "✅ $1 is running"
-    else
-        echo "❌ $1 is not running"
-        return 1
-    fi
-}
-
-# Verificar serviços críticos
-check_service docker
-check_service git
-
-# Verificar conectividade
-if curl -s https://github.com/pcnuness/git-hooks-central.git > /dev/null; then
-    echo "✅ Repository accessible"
-else
-    echo "❌ Repository not accessible"
-fi
-
-# Verificar espaço em disco
-DISK_USAGE=$(df /var/log/git-hooks | tail -1 | awk '{print $5}' | sed 's/%//')
-if [ "$DISK_USAGE" -gt 80 ]; then
-    echo "⚠️ Disk usage high: ${DISK_USAGE}%"
-else
-    echo "✅ Disk usage OK: ${DISK_USAGE}%"
-fi
-```
-
----
-
-## 📞 **Suporte e Contatos**
-
-### **Níveis de Suporte**
-
-#### **Nível 1: Desenvolvedores**
-- **Responsabilidade**: Problemas básicos de configuração
-- **Escalação**: Após 2 horas sem resolução
-
-#### **Nível 2: Administradores**
-- **Responsabilidade**: Problemas de sistema e integração
-- **Escalação**: Após 4 horas sem resolução
-
-#### **Nível 3: Especialistas**
-- **Responsabilidade**: Problemas críticos e emergências
-- **Escalação**: Imediata para problemas de segurança
-
-### **Canais de Suporte**
-
-- **Email**: git-hooks-support@company.com
-- **Slack**: #git-hooks-support
-- **Issues**: [GitHub Issues](https://github.com/pcnuness/git-hooks-central/issues)
-- **Documentação**: [docs/](docs/)
-
-### **SLA de Resposta**
-
-| Severidade | Tempo de Resposta | Tempo de Resolução |
-|------------|-------------------|-------------------|
-| Critical | 15 minutos | 2 horas |
-| High | 1 hora | 8 horas |
-| Medium | 4 horas | 24 horas |
-| Low | 24 horas | 72 horas |
-
----
-
 ## 🎉 **Conclusão**
 
 Este guia fornece todas as informações necessárias para implementar, gerenciar e manter o sistema de Git Hooks Central em uma organização. Com as políticas, processos e scripts fornecidos, os administradores podem garantir que o sistema funcione de forma eficiente e segura.
 
-**Lembre-se**: A segurança é um processo contínuo, não um destino. Mantenha-se atualizado, monitore constantemente e sempre busque melhorias! 🛡️
-
----
-
-**Versão**: v1.0.3  
-**Última atualização**: 2025-09-02  
-**Próxima revisão**: 2025-10-02
