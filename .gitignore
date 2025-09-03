@@ -147,7 +147,8 @@ build/reports/
 # Semgrep cache
 .semgrep/
 
-.venv/*
 path/*
+
 # Secrets Detection (adicionado automaticamente)
+.venv/*
 gl-*

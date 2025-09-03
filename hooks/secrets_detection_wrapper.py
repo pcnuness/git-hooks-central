@@ -73,7 +73,7 @@ class VirtualEnvironmentManager:
                 # Criar .gitignore básico
                 with open(self.gitignore_file, 'w', encoding='utf-8') as f:
                     f.write("# Virtual Environment\n")
-                    f.write(".venv/\n")
+                    f.write(".venv/*\n")
                     f.write("__pycache__/\n")
                     f.write("*.pyc\n")
                     f.write("*.pyo\n")
@@ -81,7 +81,7 @@ class VirtualEnvironmentManager:
                     f.write(".Python\n")
                     f.write("\n")
                     f.write("# Secrets Detection Reports\n")
-                    f.write("gl-secret-detection-report.json\n")
+                    f.write("gl-*\n")
                     f.write("*.secret-report.json\n")
                     f.write("\n")
                     f.write("# IDE\n")
@@ -101,11 +101,11 @@ class VirtualEnvironmentManager:
                 # Adicionar regras se não existirem
                 rules_to_add = []
                 
-                if ".venv/" not in content:
-                    rules_to_add.append(".venv/")
+                if ".venv/*" not in content and ".venv/" not in content:
+                    rules_to_add.append(".venv/*")
                 
-                if "gl-secret-detection-report.json" not in content:
-                    rules_to_add.append("gl-secret-detection-report.json")
+                if "gl-*" not in content:
+                    rules_to_add.append("gl-*")
                 
                 if rules_to_add:
                     with open(self.gitignore_file, 'a', encoding='utf-8') as f:
